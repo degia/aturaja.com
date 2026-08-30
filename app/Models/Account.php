@@ -66,4 +66,23 @@ class Account extends Model
     {
         return self::TYPE_LABELS[$this->type] ?? $this->type;
     }
+
+    public function hasUploadedIcon(): bool
+    {
+        return \App\Support\BankLogos::isUploaded($this->icon);
+    }
+
+    public function getLogoBadgeAttribute(): ?array
+    {
+        return \App\Support\BankLogos::find($this->icon);
+    }
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (! $this->hasUploadedIcon()) {
+            return null;
+        }
+
+        return route('uploads.account-logo', $this);
+    }
 }

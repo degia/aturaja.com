@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('accounts.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('accounts.store') }}" class="space-y-5" enctype="multipart/form-data">
             @csrf
             @include('accounts._form', ['submitLabel' => 'Simpan Akun'])
         </form>

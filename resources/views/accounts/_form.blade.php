@@ -2,9 +2,32 @@
 
 @php
     $old = static fn (string $field, $default = null) => old($field, $account?->{$field} ?? $default);
+
+    $initialIcon = $old('icon') ?? '';
+    $initialUpload = \App\Support\BankLogos::isUploaded($initialIcon);
+    $initialBadge = $initialUpload ? '' : $initialIcon;
+    $initialPreview = $initialUpload ? $account?->logo_url : null;
 @endphp
 
-<div x-data="{ type: @js(old('type', $account->type ?? 'cash')) }">
+<div
+    x-data="{
+        type: @js(old('type', $account->type ?? 'cash')),
+        iconValue: @js($initialBadge),
+        fileUrl: @js($initialPreview),
+        pick(code) {
+            this.iconValue = code;
+            this.fileUrl = null;
+            this.$refs.logoTouched.value = '1';
+        },
+        onFile(event) {
+            const file = event.target.files[0];
+            if (! file) return;
+            this.iconValue = '';
+            this.fileUrl = URL.createObjectURL(file);
+            this.$refs.logoTouched.value = '1';
+        },
+    }"
+>
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
             <x-neo-input label="Nama Akun" name="name" value="{{ $old('name') }}" placeholder="cth. Dompet, BCA, GoPay" required />
@@ -34,8 +57,56 @@
             @enderror
         </div>
 
-        <div>
-            <x-neo-input label="Ikon (opsional)" name="icon" value="{{ $old('icon') }}" placeholder="cth. 💼 / 🏦 / 📱" maxlength="32" />
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-muted mb-2">Logo Akun (opsional)</label>
+
+            <div class="rounded-2xl neo-inset-sm p-4">
+                <p class="mb-3 text-xs text-muted">Pilih logo bank / e-wallet dari aplikasi, atau unggah logo sendiri (SVG/PNG/JPG).</p>
+
+                <div class="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-9">
+                    @foreach (\App\Support\BankLogos::all() as $code => $bank)
+                        <button
+                            type="button"
+                            @click="pick(@js($code))"
+                            title="{{ $bank['name'] }}"
+                            :class="iconValue === @js($code) ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : ''"
+                            class="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-surface py-2.5 transition-all duration-200 ease-neo hover:-translate-y-0.5"
+                        >
+                            <span
+                                class="flex h-11 w-11 items-center justify-center rounded-xl px-0.5 text-center text-[10px] font-bold leading-none text-white"
+                                style="background-color: {{ $bank['color'] }}"
+                            >{{ $bank['label'] }}</span>
+                            <span class="max-w-full truncate text-[10px] text-muted">{{ $bank['label'] }}</span>
+                        </button>
+                    @endforeach
+                </div>
+
+                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <label
+                        for="logo"
+                        class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-surface px-4 py-2.5 text-sm font-medium text-text neo-inset-sm transition-all duration-200 ease-neo hover:-translate-y-0.5"
+                    >
+                        <x-heroicon-o-arrow-up-tray class="h-4 w-4" />
+                        Unggah Logo
+                        <input id="logo" type="file" name="logo" accept=".svg,.png,.jpg,.jpeg" class="hidden" @change="onFile($event)" />
+                    </label>
+
+                    <div class="flex items-center gap-3" x-show="fileUrl" x-cloak>
+                        <img :src="fileUrl" alt="Pratinjau logo" class="h-10 w-10 rounded-xl object-cover neo-inset-sm" />
+                        <span class="text-xs text-muted">Logo custom dipilih.</span>
+                    </div>
+                </div>
+
+                <input type="hidden" name="icon" x-model="iconValue" />
+                <input type="hidden" name="logo_touched" value="0" x-ref="logoTouched" />
+
+                @error('icon')
+                    <p class="mt-2 text-sm text-danger">{{ $message }}</p>
+                @enderror
+                @error('logo')
+                    <p class="mt-2 text-sm text-danger">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <div>

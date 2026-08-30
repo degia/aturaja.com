@@ -11,6 +11,7 @@ use App\Http\Controllers\LiabilityController;
 use App\Http\Controllers\NetWorthController;
 use App\Http\Controllers\RecurringRuleController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\UploadsController;
 use App\Http\Controllers\WorkspaceSwitchController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     Route::resource('accounts', AccountController::class)->except(['show']);
     Route::patch('accounts/{account}/archive', [AccountController::class, 'archive'])->name('accounts.archive');
+    Route::get('uploads/account-logos/{account}', [UploadsController::class, 'accountLogo'])->name('uploads.account-logo');
 
     Route::resource('categories', CategoryController::class)->except(['show']);
     Route::patch('categories/{category}/archive', [CategoryController::class, 'archive'])->name('categories.archive');

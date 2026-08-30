@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Support\BankLogos;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -33,6 +35,10 @@ class AccountController extends Controller
         $data = $this->validated($request);
         $data['is_emergency_fund'] = $request->boolean('is_emergency_fund');
 
+        if ($request->hasFile('logo')) {
+            $data['icon'] = $this->storeLogo($request);
+        }
+
         Account::create($data);
 
         return redirect()->route('accounts.index')->with('status', 'Akun berhasil ditambahkan.');
@@ -47,6 +53,14 @@ class AccountController extends Controller
     {
         $data = $this->validated($request);
         $data['is_emergency_fund'] = $request->boolean('is_emergency_fund');
+
+        if ($request->hasFile('logo')) {
+            $this->forgetLogo($account);
+            $data['icon'] = $this->storeLogo($request);
+        } elseif ($request->boolean('logo_touched')) {
+            $data['icon'] = $request->input('icon') ?: null;
+            $this->forgetLogo($account, $data['icon']);
+        }
 
         $account->update($data);
 
@@ -79,9 +93,26 @@ class AccountController extends Controller
             'credit_limit' => ['nullable', 'numeric', 'min:0'],
             'billing_date' => ['nullable', 'integer', 'between:1,31'],
             'due_date' => ['nullable', 'integer', 'between:1,31'],
-            'icon' => ['nullable', 'string', 'max:32'],
+            'icon' => ['nullable', 'string', 'max:255'],
+            'logo' => ['nullable', 'file', 'mimes:svg,png,jpg,jpeg', 'max:1024'],
+            'logo_touched' => ['nullable', 'in:0,1'],
             'color' => ['nullable', 'string', 'max:20'],
             'is_emergency_fund' => ['nullable', 'boolean'],
         ]);
+    }
+
+    private function storeLogo(Request $request): string
+    {
+        $path = $request->file('logo')->store('account-logos', ['disk' => 'public']);
+
+        return BankLogos::UPLOAD_PREFIX.$path;
+    }
+
+    private function forgetLogo(Account $account, ?string $nextIcon = null): void
+    {
+        $oldPath = BankLogos::uploadedPath($account->icon);
+        if ($oldPath !== null && $oldPath !== BankLogos::uploadedPath($nextIcon)) {
+            Storage::disk('public')->delete($oldPath);
+        }
     }
 }

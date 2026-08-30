@@ -52,10 +52,7 @@
                 <ul class="divide-y divide-shadow-dark/20">
                     @foreach ($group as $account)
                         <li class="flex flex-wrap items-center gap-4 px-6 py-4">
-                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl neo-inset-sm text-lg">
-                                {{ $account->icon ?? '💼' }}
-                            </div>
-
+                            <x-account-logo :icon="$account->icon" :logo-url="$account->logo_url" />
                             <div class="min-w-0 flex-1">
                                 <p class="flex items-center gap-2 font-semibold text-text">
                                     {{ $account->name }}

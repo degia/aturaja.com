@@ -12,7 +12,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('accounts.update', $account) }}">
+        <form method="POST" action="{{ route('accounts.update', $account) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             @include('accounts._form', ['submitLabel' => 'Perbarui Akun'])
