@@ -5,6 +5,8 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\FinancialHealthController;
 use App\Http\Controllers\LiabilityController;
 use App\Http\Controllers\NetWorthController;
 use App\Http\Controllers\RecurringRuleController;
@@ -31,6 +33,10 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('budgets', fn () => view('budgets.index'))->name('budgets.index');
 
     Route::get('net-worth', NetWorthController::class)->name('net-worth');
+    Route::get('financial-health', FinancialHealthController::class)->name('financial-health');
+    Route::post('exports', [ExportController::class, 'store'])->name('exports.store');
+    Route::get('exports', [ExportController::class, 'index'])->name('exports.index');
+    Route::get('exports/{exportJob}/download', [ExportController::class, 'download'])->name('exports.download');
     Route::post('assets', [AssetController::class, 'store'])->name('assets.store');
     Route::patch('assets/{asset}', [AssetController::class, 'update'])->name('assets.update');
     Route::delete('assets/{asset}', [AssetController::class, 'destroy'])->name('assets.destroy');

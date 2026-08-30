@@ -29,11 +29,11 @@
         ],
         'Workspace' => [
             ['label' => 'Categories & Tags', 'href' => route('categories.index'), 'icon' => $iconTag],
-            ['label' => 'Financial Health', 'href' => '#', 'icon' => $iconHeart],
+            ['label' => 'Financial Health', 'href' => route('financial-health'), 'icon' => $iconHeart],
         ],
         'Management' => [
             ['label' => 'Workspace Settings', 'href' => '#', 'icon' => $iconCog],
-            ['label' => 'Export & Reports History', 'href' => '#', 'icon' => $iconExport],
+            ['label' => 'Export & Reports History', 'href' => route('exports.index'), 'icon' => $iconExport],
             ['label' => 'Billing & Subscription', 'href' => '#', 'icon' => $iconCard],
         ],
     ];

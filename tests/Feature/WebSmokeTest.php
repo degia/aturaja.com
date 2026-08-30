@@ -133,6 +133,29 @@ class WebSmokeTest extends TestCase
             ->assertSee('Tambah Utang');
     }
 
+    public function test_halaman_financial_health_dapat_dibuka(): void
+    {
+        $this->actingAs($this->user)
+            ->get('/financial-health')
+            ->assertOk()
+            ->assertSee('Skor Kesehatan Keuangan')
+            ->assertSee('Rasio Tabungan')
+            ->assertSee('Rasio Utang (DTI)')
+            ->assertSee('Dana Darurat');
+    }
+
+    public function test_halaman_export_dan_tombol_export_csv_dashboard(): void
+    {
+        $this->actingAs($this->user)
+            ->get('/exports')
+            ->assertOk()
+            ->assertSee('Buat Export Baru')
+            ->assertSee('Export CSV');
+
+        $html = $this->actingAs($this->user)->get('/dashboard')->getContent();
+        $this->assertStringContainsString('Export CSV', $html, 'Tombol Export CSV harus ada di topbar dashboard.');
+    }
+
     public function test_halaman_proteksi_melempar_tamu_ke_login(): void
     {
         $this->get('/transactions')->assertRedirect('/login');
