@@ -30,6 +30,7 @@ class Account extends Model
         'billing_date',
         'due_date',
         'is_archived',
+        'is_emergency_fund',
         'icon',
         'color',
     ];
@@ -42,6 +43,7 @@ class Account extends Model
             'billing_date' => 'integer',
             'due_date' => 'integer',
             'is_archived' => 'boolean',
+            'is_emergency_fund' => 'boolean',
         ];
     }
 

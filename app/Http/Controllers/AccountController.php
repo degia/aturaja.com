@@ -31,6 +31,7 @@ class AccountController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
+        $data['is_emergency_fund'] = $request->boolean('is_emergency_fund');
 
         Account::create($data);
 
@@ -44,7 +45,10 @@ class AccountController extends Controller
 
     public function update(Request $request, Account $account): RedirectResponse
     {
-        $account->update($this->validated($request));
+        $data = $this->validated($request);
+        $data['is_emergency_fund'] = $request->boolean('is_emergency_fund');
+
+        $account->update($data);
 
         return redirect()->route('accounts.index')->with('status', 'Akun berhasil diperbarui.');
     }
@@ -77,6 +81,7 @@ class AccountController extends Controller
             'due_date' => ['nullable', 'integer', 'between:1,31'],
             'icon' => ['nullable', 'string', 'max:32'],
             'color' => ['nullable', 'string', 'max:20'],
+            'is_emergency_fund' => ['nullable', 'boolean'],
         ]);
     }
 }

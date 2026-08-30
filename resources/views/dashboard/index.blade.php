@@ -21,6 +21,8 @@
 
         <livewire:dashboard-charts />
 
+        <livewire:financial-health />
+
         <x-neo-card class="!p-0">
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-shadow-dark/40 px-6 py-4">
                 <h2 class="font-semibold text-text">Transaksi Terbaru</h2>

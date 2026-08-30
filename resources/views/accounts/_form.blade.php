@@ -69,6 +69,21 @@
         </div>
     </div>
 
+    <div class="mt-5 flex items-center gap-3 rounded-2xl neo-inset-sm px-4 py-3">
+        <input
+            id="is_emergency_fund"
+            type="checkbox"
+            name="is_emergency_fund"
+            value="1"
+            class="h-4 w-4 rounded accent-primary"
+            {{ $old('is_emergency_fund') ? 'checked' : '' }}
+        >
+        <label for="is_emergency_fund" class="text-sm text-text">
+            Tandai sebagai <strong>Dana Darurat</strong>
+            <span class="block text-xs text-muted">Saldo akun ini dihitung di rasio Dana Darurat (Financial Health).</span>
+        </label>
+    </div>
+
     <div class="mt-6 flex items-center gap-3">
         <x-neo-button variant="primary">{{ $submitLabel }}</x-neo-button>
         <x-neo-button variant="ghost" href="{{ route('accounts.index') }}">Batal</x-neo-button>
