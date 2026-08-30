@@ -98,6 +98,15 @@ class WebSmokeTest extends TestCase
             ->assertSee('Tambah Aturan Berulang');
     }
 
+    public function test_halaman_budget_merender_matrik_anggaran(): void
+    {
+        $this->actingAs($this->user)
+            ->get('/budgets')
+            ->assertOk()
+            ->assertSee('Anggaran')
+            ->assertSee('Makanan');
+    }
+
     public function test_halaman_proteksi_melempar_tamu_ke_login(): void
     {
         $this->get('/transactions')->assertRedirect('/login');

@@ -22,7 +22,7 @@
             ['label' => 'Transactions', 'href' => route('transactions.index'), 'icon' => $iconSwap],
             ['label' => 'Accounts & Wallets', 'href' => route('accounts.index'), 'icon' => $iconWallet],
             ['label' => 'Transaksi Berulang', 'href' => route('recurring.index'), 'icon' => $iconClock],
-            ['label' => 'Budgets', 'href' => '#', 'icon' => $iconPie],
+            ['label' => 'Budgets', 'href' => route('budgets.index'), 'icon' => $iconPie],
             ['label' => 'Reports', 'href' => '#', 'icon' => $iconBar],
             ['label' => 'Debt Tracker', 'href' => '#', 'icon' => $iconScale],
         ],

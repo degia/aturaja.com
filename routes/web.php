@@ -24,6 +24,8 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     Route::get('transactions', fn () => view('transactions.index'))->name('transactions.index');
 
+    Route::get('budgets', fn () => view('budgets.index'))->name('budgets.index');
+
     Route::get('recurring/create', [RecurringRuleController::class, 'create'])->name('recurring.create');
     Route::post('recurring', [RecurringRuleController::class, 'store'])->name('recurring.store');
     Route::delete('recurring/{rule}', [RecurringRuleController::class, 'destroy'])->name('recurring.destroy');
