@@ -2,7 +2,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
             <div class="flex h-10 w-10 items-center justify-center rounded-2xl neo-inset-sm text-muted">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5"/></svg>
+                <x-heroicon-o-chart-bar-square class="h-5 w-5" />
             </div>
             <div>
                 <h2 class="font-semibold text-text">Laporan Arus Kas & Pengeluaran</h2>
@@ -36,10 +36,10 @@
 
             <div class="flex items-center gap-1">
                 <button type="button" wire:click="shift(-1)" class="flex h-10 w-10 items-center justify-center rounded-xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-primary" title="Periode sebelumnya">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+                    <x-heroicon-o-chevron-left class="h-4 w-4" />
                 </button>
                 <button type="button" wire:click="shift(1)" class="flex h-10 w-10 items-center justify-center rounded-xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-primary" title="Periode berikutnya">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    <x-heroicon-o-chevron-right class="h-4 w-4" />
                 </button>
             </div>
         </div>

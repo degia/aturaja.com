@@ -7,7 +7,7 @@
                 <div class="mb-6 flex items-center justify-between">
                     <h2 class="text-lg font-bold text-text">{{ $editingId ? 'Ubah Transaksi' : 'Tambah Transaksi' }}</h2>
                     <button type="button" @click="$wire.close()" class="flex h-9 w-9 items-center justify-center rounded-xl neo-card text-muted transition-all duration-200 ease-neo hover:text-text" title="Tutup">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <x-heroicon-o-x-mark class="h-5 w-5" />
                     </button>
                 </div>
 

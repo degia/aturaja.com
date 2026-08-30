@@ -84,14 +84,14 @@
 
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('accounts.edit', $account) }}" class="flex h-10 w-10 items-center justify-center rounded-2xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-primary" title="Edit akun">
-                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                                    <x-heroicon-o-pencil-square class="h-4 w-4" />
                                 </a>
 
                                 <form method="POST" action="{{ route('accounts.archive', $account) }}">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="flex h-10 w-10 items-center justify-center rounded-2xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-warning" title="{{ $account->is_archived ? 'Kembalikan akun' : 'Arsipkan akun' }}">
-                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+                                        <x-heroicon-o-folder class="h-4 w-4" />
                                     </button>
                                 </form>
                             </div>
@@ -105,7 +105,7 @@
             <x-neo-card>
                 <div class="flex flex-col items-center gap-3 py-10 text-center">
                     <div class="flex h-12 w-12 items-center justify-center rounded-2xl neo-inset text-muted">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"/></svg>
+                        <x-heroicon-o-wallet class="h-6 w-6" />
                     </div>
                     <p class="font-medium text-text">Belum ada akun</p>
                     <p class="text-sm text-muted">Tambahkan akun pertama untuk mulai mencatat.</p>

@@ -57,7 +57,7 @@
                 @click="mobileOpen = !mobileOpen"
                 aria-label="Buka menu navigasi"
             >
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                <x-heroicon-o-bars-3 class="h-5 w-5" />
             </button>
 
             <button
@@ -66,14 +66,14 @@
                 @click="collapsed = !collapsed"
                 aria-label="Lipat atau buka sidebar"
             >
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                <x-heroicon-o-bars-3 class="h-5 w-5" />
             </button>
 
             {{-- Breadcrumb --}}
             <nav class="hidden min-w-0 items-center gap-2 truncate text-sm md:flex" aria-label="Breadcrumb">
                 <a href="{{ route('dashboard') }}" class="font-medium text-muted transition-colors hover:text-primary">Dashboard</a>
                 @if (isset($breadcrumb) && ! empty($breadcrumb))
-                    <svg class="h-4 w-4 shrink-0 text-muted/60" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                    <x-heroicon-o-chevron-right class="h-4 w-4 shrink-0 text-muted/60" />
                     <span class="truncate font-semibold text-text">{{ $breadcrumb }}</span>
                 @endif
             </nav>
@@ -82,7 +82,7 @@
                 {{-- Search --}}
                 <form action="#" class="relative hidden sm:block w-56 xl:w-72">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-muted">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        <x-heroicon-o-magnifying-glass class="h-4 w-4" />
                     </span>
                     <input
                         type="search"
@@ -93,7 +93,7 @@
 
                 {{-- Notifikasi --}}
                 <a href="#" class="relative flex h-10 w-10 items-center justify-center rounded-2xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-text" aria-label="Notifikasi">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+                    <x-heroicon-o-bell class="h-5 w-5" />
                     @if (($notificationCount ?? 0) > 0)
                         <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">
                             {{ $notificationCount }}

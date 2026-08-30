@@ -46,11 +46,22 @@ class WebSmokeTest extends TestCase
 
     public function test_halaman_transaksi_merender_tabel_livewire(): void
     {
-        $this->actingAs($this->user)
+        $html = $this->actingAs($this->user)
             ->get('/transactions')
             ->assertOk()
             ->assertSee('Tambah Transaksi')
-            ->assertSee('Semua Akun');
+            ->assertSee('Semua Akun')
+            ->getContent();
+
+        $this->assertStringContainsString('m21 21-5.197-5.197', $html, 'Ikon pencarian (magnifying-glass) harus dirender dari Blade Icons.');
+    }
+
+    public function test_sidebar_menggunakan_blade_icons_heroicons(): void
+    {
+        $html = $this->actingAs($this->user)->get('/dashboard')->getContent();
+
+        $this->assertStringNotContainsString('stroke-width="1.8"', $html, 'Sidebar/topbar tidak boleh lagi memuat SVG inline lama (Blade Icons memakai stroke-width 1.5).');
+        $this->assertStringContainsString('M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25', $html, 'Ikon dashboard (squares-2x2) harus dirender dari Blade Icons.');
     }
 
     public function test_halaman_akun_dan_form_akun_dapat_dibuka(): void
