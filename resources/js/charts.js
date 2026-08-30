@@ -28,6 +28,31 @@ export function renderTrend(canvas, { labels, income, expense }) {
     });
 }
 
+export function renderNetWorth(canvas, { labels, assets, liabilities, netWorth }) {
+    return new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Aset', data: assets, borderColor: PALETTE.green, backgroundColor: 'rgba(22,163,74,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 2 },
+                { label: 'Kewajiban', data: liabilities, borderColor: '#D97706', backgroundColor: 'rgba(217,119,6,0.06)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 2 },
+                { label: 'Net Worth', data: netWorth, borderColor: '#15803D', backgroundColor: 'transparent', tension: 0.4, borderWidth: 2.5, pointRadius: 2 },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            animation: { duration: 900, easing: 'easeOutQuart' },
+            plugins: { legend: { position: 'bottom', labels: { color: PALETTE.tick, usePointStyle: true, boxWidth: 8 } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: PALETTE.tick, font: { size: 11 } } },
+                y: { grid: { color: PALETTE.grid }, ticks: { color: PALETTE.tick, font: { size: 11 }, callback: (v) => `${Math.round(v / 1000)}jt` } },
+            },
+        },
+    });
+}
+
 export function renderDoughnut(canvas, { labels, values, colors }) {
     return new Chart(canvas, {
         type: 'doughnut',

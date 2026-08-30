@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AssetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DebtController;
+use App\Http\Controllers\LiabilityController;
+use App\Http\Controllers\NetWorthController;
 use App\Http\Controllers\RecurringRuleController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\WorkspaceSwitchController;
@@ -25,6 +29,21 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('transactions', fn () => view('transactions.index'))->name('transactions.index');
 
     Route::get('budgets', fn () => view('budgets.index'))->name('budgets.index');
+
+    Route::get('net-worth', NetWorthController::class)->name('net-worth');
+    Route::post('assets', [AssetController::class, 'store'])->name('assets.store');
+    Route::patch('assets/{asset}', [AssetController::class, 'update'])->name('assets.update');
+    Route::delete('assets/{asset}', [AssetController::class, 'destroy'])->name('assets.destroy');
+    Route::post('liabilities', [LiabilityController::class, 'store'])->name('liabilities.store');
+    Route::patch('liabilities/{liability}', [LiabilityController::class, 'update'])->name('liabilities.update');
+    Route::delete('liabilities/{liability}', [LiabilityController::class, 'destroy'])->name('liabilities.destroy');
+
+    Route::get('debts', [DebtController::class, 'index'])->name('debts.index');
+    Route::post('debts', [DebtController::class, 'store'])->name('debts.store');
+    Route::patch('debts/{debt}', [DebtController::class, 'update'])->name('debts.update');
+    Route::delete('debts/{debt}', [DebtController::class, 'destroy'])->name('debts.destroy');
+    Route::post('debts/{debt}/payments', [DebtController::class, 'storePayment'])->name('debts.payments.store');
+    Route::delete('debts/{debt}/payments/{payment}', [DebtController::class, 'destroyPayment'])->name('debts.payments.destroy');
 
     Route::get('recurring/create', [RecurringRuleController::class, 'create'])->name('recurring.create');
     Route::post('recurring', [RecurringRuleController::class, 'store'])->name('recurring.store');

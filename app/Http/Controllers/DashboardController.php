@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\NetWorth\Actions\NetWorthCalculator;
 use App\Domain\Reports\Actions\CashFlowReport;
-use App\Models\Account;
 use App\Models\Transaction;
 
 class DashboardController extends Controller
@@ -19,12 +19,7 @@ class DashboardController extends Controller
         $totals = $cashFlow->totals($from, $to);
         $previous = $cashFlow->totals($previousFrom, $previousTo);
 
-        $liquidBalance = (float) Account::query()
-            ->whereIn('type', ['cash', 'bank', 'ewallet'])
-            ->sum('balance');
-        $creditBalance = (float) Account::query()
-            ->where('type', 'credit_card')
-            ->sum('balance');
+        $netWorth = (new NetWorthCalculator())->calculate();
 
         return view('dashboard.index', [
             'currentWorkspace' => auth()->user()->currentWorkspace(),
@@ -32,7 +27,7 @@ class DashboardController extends Controller
                 'income' => $totals['income'],
                 'expense' => $totals['expense'],
                 'net' => $totals['net'],
-                'netWorth' => round($liquidBalance - $creditBalance, 2),
+                'netWorth' => $netWorth['net_worth'],
                 'incomeDelta' => $previous['income'] > 0 ? round((($totals['income'] - $previous['income']) / $previous['income']) * 100, 1) : null,
                 'expenseDelta' => $previous['expense'] > 0 ? round((($totals['expense'] - $previous['expense']) / $previous['expense']) * 100, 1) : null,
             ],

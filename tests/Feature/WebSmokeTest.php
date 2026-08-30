@@ -107,6 +107,21 @@ class WebSmokeTest extends TestCase
             ->assertSee('Makanan');
     }
 
+    public function test_halaman_net_worth_dan_debt_tracker_dapat_dibuka(): void
+    {
+        $this->actingAs($this->user)
+            ->get('/net-worth')
+            ->assertOk()
+            ->assertSee('Net Worth')
+            ->assertSee('Total Aset');
+
+        $this->actingAs($this->user)
+            ->get('/debts')
+            ->assertOk()
+            ->assertSee('Debt Tracker')
+            ->assertSee('Tambah Utang');
+    }
+
     public function test_halaman_proteksi_melempar_tamu_ke_login(): void
     {
         $this->get('/transactions')->assertRedirect('/login');

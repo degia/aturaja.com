@@ -23,8 +23,9 @@
             ['label' => 'Accounts & Wallets', 'href' => route('accounts.index'), 'icon' => $iconWallet],
             ['label' => 'Transaksi Berulang', 'href' => route('recurring.index'), 'icon' => $iconClock],
             ['label' => 'Budgets', 'href' => route('budgets.index'), 'icon' => $iconPie],
-            ['label' => 'Reports', 'href' => '#', 'icon' => $iconBar],
-            ['label' => 'Debt Tracker', 'href' => '#', 'icon' => $iconScale],
+            ['label' => 'Net Worth', 'href' => route('net-worth'), 'icon' => $iconBar],
+            ['label' => 'Reports', 'href' => '#', 'icon' => $iconScale],
+            ['label' => 'Debt Tracker', 'href' => route('debts.index'), 'icon' => $iconHeart],
         ],
         'Workspace' => [
             ['label' => 'Categories & Tags', 'href' => route('categories.index'), 'icon' => $iconTag],
