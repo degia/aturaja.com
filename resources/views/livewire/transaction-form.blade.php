@@ -15,11 +15,11 @@
                     <div>
                         <label class="block text-sm font-medium text-muted mb-2">Tipe Transaksi</label>
                         <div class="flex gap-2">
-                            @foreach (\App\Models\Transaction::TYPES as $type)
+                            @foreach (\App\Models\Transaction::TYPES as $typeKey)
                                 <label class="flex-1 cursor-pointer">
-                                    <input type="radio" wire:model.live="type" value="{{ $type }}" class="peer sr-only">
+                                    <input type="radio" wire:model.live="type" value="{{ $typeKey }}" class="peer sr-only">
                                     <span class="flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold neo-inset-sm peer-checked:bg-primary peer-checked:text-white transition-all duration-200">
-                                        {{ \App\Models\Transaction::TYPE_LABELS[$type] }}
+                                        {{ \App\Models\Transaction::TYPE_LABELS[$typeKey] }}
                                     </span>
                                 </label>
                             @endforeach
