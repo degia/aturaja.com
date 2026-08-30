@@ -44,7 +44,7 @@
 <div class="flex h-full flex-col">
     <div class="flex items-center gap-3 px-5 h-16 lg:h-20">
         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl neo-card">
-            <span class="text-lg font-extrabold text-primary">A</span>
+            <img src="{{ asset('logo.png') }}" alt="Logo"">
         </div>
         <div :class="collapsed ? 'lg:hidden' : ''" class="min-w-0 whitespace-nowrap transition-all duration-200">
             <p class="text-base font-bold leading-tight text-text">AturAja</p>
