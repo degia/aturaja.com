@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --bg: #EAF3EC;
+        --surface: #F2F8F4;
+        --shadow-light: #FFFFFF;
+        --shadow-dark: #C6D6CB;
+        --primary: #16A34A;
+        --primary-dark: #15803D;
+        --primary-soft: #DCFCE7;
+        --text: #1C2B22;
+        --text-muted: #6B8074;
+        --danger: #DC2626;
+        --warning: #D97706;
+        --radius-lg: 20px;
+        --radius-md: 14px;
+        --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    html {
+        font-family: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+        background-color: var(--primary-soft);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .neo-card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+        transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
+    }
+
+    .neo-card--hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
+    }
+
+    .neo-inset {
+        background: var(--surface);
+        border-radius: var(--radius-md);
+        box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
+    }
+
+    .neo-inset-sm {
+        background: var(--surface);
+        border-radius: var(--radius-md);
+        box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+    }
+}
+
+@layer utilities {
+    .ease-neo {
+        transition-timing-function: var(--ease);
+    }
+}
