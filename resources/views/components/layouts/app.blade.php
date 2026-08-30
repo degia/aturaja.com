@@ -81,7 +81,7 @@
 
             <div class="ml-auto flex items-center gap-3 lg:gap-5">
                 {{-- Search --}}
-                <form action="#" class="relative hidden sm:block w-56 xl:w-72">
+                {{-- <form action="#" class="relative hidden sm:block w-56 xl:w-72">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-muted">
                         <x-heroicon-o-magnifying-glass class="h-4 w-4" />
                     </span>
@@ -90,20 +90,7 @@
                         placeholder="Cari transaksi, kategori, tag..."
                         class="w-full rounded-[14px] neo-inset-sm bg-surface py-2.5 pl-11 pr-4 text-sm text-text placeholder:text-muted/60 outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40"
                     >
-                </form>
-
-                {{-- Export CSV cepat --}}
-                <form method="POST" action="{{ route('exports.store') }}" class="hidden md:block">
-                    @csrf
-                    <input type="hidden" name="report" value="transactions">
-                    <input type="hidden" name="type" value="csv">
-                    <input type="hidden" name="from" value="{{ now()->startOfMonth()->format('Y-m-d') }}">
-                    <input type="hidden" name="to" value="{{ now()->endOfMonth()->format('Y-m-d') }}">
-                    <button type="submit" class="flex items-center gap-2 rounded-[14px] neo-card px-4 py-2.5 text-sm font-medium text-text transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-primary" aria-label="Export CSV transaksi bulan ini">
-                        <x-heroicon-o-arrow-down-tray class="h-4 w-4" />
-                        <span class="hidden xl:inline">Export CSV</span>
-                    </button>
-                </form>
+                </form> --}}
 
                 {{-- Notifikasi --}}
                 <a href="#" class="relative flex h-10 w-10 items-center justify-center rounded-2xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-text" aria-label="Notifikasi">

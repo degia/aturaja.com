@@ -65,17 +65,39 @@
 
                 <div class="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-9">
                     @foreach (\App\Support\BankLogos::all() as $code => $bank)
+                        @php
+                            $logoUrl = \App\Support\BankLogos::getUrl($code);
+                        @endphp
+
                         <button
                             type="button"
                             @click="pick(@js($code))"
                             title="{{ $bank['name'] }}"
                             :class="iconValue === @js($code) ? 'ring-2 ring-primary ring-offset-2 ring-offset-surface' : ''"
-                            class="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-surface py-2.5 transition-all duration-200 ease-neo hover:-translate-y-0.5"
+                            class="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-surface p-2.5 transition-all duration-200 ease-neo hover:-translate-y-0.5"
                         >
-                            <span
-                                class="flex h-11 w-11 items-center justify-center rounded-xl px-0.5 text-center text-[10px] font-bold leading-none text-white"
-                                style="background-color: {{ $bank['color'] }}"
-                            >{{ $bank['label'] }}</span>
+                            <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-surface-muted/50 p-1">
+                                @if ($logoUrl)
+                                    <img
+                                        src="{{ $logoUrl }}"
+                                        alt="{{ $bank['name'] }}"
+                                        class="h-full w-full object-contain"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                    />
+                                    <!-- Fallback jika image onerror/gagal load -->
+                                    <span
+                                        class="hidden h-full w-full items-center justify-center rounded-lg px-0.5 text-center text-[10px] font-bold leading-none text-white"
+                                        style="background-color: {{ $bank['color'] }}"
+                                    >{{ $bank['label'] }}</span>
+                                @else
+                                    <!-- Fallback default jika URL belum diset -->
+                                    <span
+                                        class="flex h-full w-full items-center justify-center rounded-lg px-0.5 text-center text-[10px] font-bold leading-none text-white"
+                                        style="background-color: {{ $bank['color'] }}"
+                                    >{{ $bank['label'] }}</span>
+                                @endif
+                            </div>
+
                             <span class="max-w-full truncate text-[10px] text-muted">{{ $bank['label'] }}</span>
                         </button>
                     @endforeach

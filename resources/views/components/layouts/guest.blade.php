@@ -13,7 +13,7 @@
         <div class="w-full max-w-md">
             <div class="mb-8 text-center">
                 <a href="{{ route('dashboard') }}" class="inline-flex h-16 w-16 items-center justify-center rounded-2xl neo-card mb-4">
-                    <span class="text-2xl font-extrabold text-primary">A</span>
+                    <img src="{{ asset('logo.png') }}" alt="Logo"">
                 </a>
                 <h1 class="text-2xl font-bold text-text">AturAja</h1>
                 <p class="mt-1 text-sm text-muted">Atur uangmu, aja.</p>
