@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Reports\Actions\HealthScoreCalculator;
 use App\Models\Account;
+use App\Models\Debt;
 use App\Models\Liability;
 use App\Models\Transaction;
 use App\Models\User;
@@ -45,7 +46,7 @@ class HealthScoreTest extends TestCase
 
     public function test_skor_kesehatan_adalah_rata_rata_tiga_subskor(): void
     {
-        $report = (new HealthScoreCalculator())->buildResult(
+        $report = (new HealthScoreCalculator)->buildResult(
             income: 10_000_000,
             expense: 7_000_000,
             monthlyInstallments: 1_000_000,
@@ -62,7 +63,7 @@ class HealthScoreTest extends TestCase
 
     public function test_status_rasio_tabungan_di_bawah_tepat_dan_di_atas_ideal(): void
     {
-        $calculator = new HealthScoreCalculator();
+        $calculator = new HealthScoreCalculator;
 
         $this->assertSame('healthy', $calculator->savingsRateStatus(20));
         $this->assertSame('healthy', $calculator->savingsRateStatus(25));
@@ -74,7 +75,7 @@ class HealthScoreTest extends TestCase
 
     public function test_status_dti_di_bawah_tepat_dan_di_atas_ideal(): void
     {
-        $calculator = new HealthScoreCalculator();
+        $calculator = new HealthScoreCalculator;
 
         $this->assertSame('healthy', $calculator->dtiStatus(30));
         $this->assertSame('healthy', $calculator->dtiStatus(20));
@@ -86,7 +87,7 @@ class HealthScoreTest extends TestCase
 
     public function test_status_dana_darurat_di_bawah_di_ideal_dan_di_atas(): void
     {
-        $calculator = new HealthScoreCalculator();
+        $calculator = new HealthScoreCalculator;
 
         $this->assertSame('danger', $calculator->emergencyStatus(0));
         $this->assertSame('warning', $calculator->emergencyStatus(2));
@@ -97,7 +98,7 @@ class HealthScoreTest extends TestCase
 
     public function test_rekomendasi_dihasilkan_berdasarkan_status(): void
     {
-        $report = (new HealthScoreCalculator())->buildResult(
+        $report = (new HealthScoreCalculator)->buildResult(
             income: 10_000_000,
             expense: 9_000_000,
             monthlyInstallments: 5_000_000,
@@ -129,7 +130,7 @@ class HealthScoreTest extends TestCase
         Account::create(['name' => 'Dana Darurat', 'type' => 'bank', 'balance' => 15_000_000, 'is_emergency_fund' => true]);
         Account::create(['name' => 'Tabungan', 'type' => 'bank', 'balance' => 9_000_000, 'is_emergency_fund' => false]);
 
-        $report = (new HealthScoreCalculator())->calculate('2026-08-31');
+        $report = (new HealthScoreCalculator)->calculate('2026-08-31');
 
         // Income 10jt, expense 7jt -> savings rate 30%
         $this->assertSame(30.0, $report['ratios']['savings_rate']['value']);
@@ -142,5 +143,27 @@ class HealthScoreTest extends TestCase
         $this->assertSame('warning', $report['ratios']['emergency_fund']['status']);
 
         $this->assertSame(15_000_000.0, $report['totals']['emergency_balance']);
+    }
+
+    public function test_dti_menghitung_cicilan_debt_tenor_yang_jatuh_tempo(): void
+    {
+        $this->transaction('income', 10_000_000, '2026-08-15');
+
+        $debt = Debt::create([
+            'direction' => 'payable',
+            'counterparty_name' => 'Bank',
+            'principal_amount' => 6_000_000,
+            'remaining_amount' => 6_000_000,
+            'installments_count' => 6,
+            'first_due_date' => '2026-07-10',
+        ]);
+        $debt->generateSchedule();
+
+        // Cicilan jatuh tempo di bulan Agustus: no 1 (10 Jul) & no 2 (10 Agu)
+        $report = (new HealthScoreCalculator)->calculate('2026-08-31');
+
+        // installment bulanan = 6.000.000 / 6 = 1.000.000
+        $this->assertSame(1_000_000.0, $report['totals']['monthly_installments']);
+        $this->assertSame(10.0, $report['ratios']['dti']['value']);
     }
 }

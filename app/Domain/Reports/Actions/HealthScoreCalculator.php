@@ -3,14 +3,18 @@
 namespace App\Domain\Reports\Actions;
 
 use App\Models\Account;
+use App\Models\Debt;
 use App\Models\Liability;
 use App\Models\Transaction;
 
 class HealthScoreCalculator
 {
     public const IDEAL_SAVINGS_RATE = 20.0;
+
     public const IDEAL_DTI = 30.0;
+
     public const EMERGENCY_MIN_MONTHS = 3.0;
+
     public const EMERGENCY_MAX_MONTHS = 6.0;
 
     public function calculate(?string $referenceDate = null): array
@@ -25,7 +29,7 @@ class HealthScoreCalculator
             ->whereMonth('transaction_date', $reference->month)
             ->sum('amount');
 
-        $monthlyInstallments = (float) Liability::sum('monthly_installment');
+        $monthlyInstallments = $this->monthlyDebtObligation($reference);
 
         $emergencyBalance = (float) Account::where('is_emergency_fund', true)->sum('balance');
 
@@ -218,6 +222,49 @@ class HealthScoreCalculator
         }
 
         return 'Anda belum memiliki dana darurat. Sisihkan saldo ke akun yang ditandai sebagai Dana Darurat.';
+    }
+
+    /**
+     * Total kewajiban cicilan bulanan untuk bulan referensi.
+     *
+     * Menggabungkan beban dari model Debt (kewajiban terbaru di Debt Tracker)
+     * dengan model Liability legacy supaya tidak ada utang yang terlewat.
+     *
+     * Untuk Debt dengan tenor: dihitung dari jumlah cicilan yang jatuh tempo di
+     * bulan referensi dan belum lunas. Untuk Debt tanpa tenor: memakai
+     * installment_amount sebagai beban bulanan manual.
+     */
+    private function monthlyDebtObligation($reference): float
+    {
+        $total = 0.0;
+
+        foreach (Liability::query()->get() as $liability) {
+            $total += (float) $liability->monthly_installment;
+        }
+
+        $monthStart = $reference->copy()->startOfMonth();
+        $monthEnd = $reference->copy()->endOfMonth();
+
+        foreach (Debt::query()->where('direction', 'payable')->with('installments')->get() as $debt) {
+            $hasTenor = (int) $debt->installments_count > 0;
+
+            if ($hasTenor) {
+                foreach ($debt->installments as $installment) {
+                    if ($installment->status === 'paid') {
+                        continue;
+                    }
+
+                    $due = $installment->due_date;
+                    if ($due >= $monthStart && $due <= $monthEnd) {
+                        $total += (float) $installment->amount;
+                    }
+                }
+            } else {
+                $total += (float) $debt->installment_amount;
+            }
+        }
+
+        return round($total, 2);
     }
 
     private function averageMonthlyExpense($reference): float
