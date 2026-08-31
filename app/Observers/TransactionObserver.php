@@ -29,6 +29,21 @@ class TransactionObserver
         );
 
         $this->applyEffects($transaction);
+
+        // Jaga konsistensi dua arah: ubah transaksi -> ikut ubah catatan
+        // pembayaran utang/piutang (tanpa memicu sinkron balik).
+        $payment = $transaction->debtPayment;
+
+        if ($payment) {
+            $payment->forceFill([
+                'amount' => $transaction->amount,
+                'paid_at' => $transaction->transaction_date,
+                'account_id' => $transaction->account_id,
+                'note' => $transaction->note,
+            ])->saveQuietly();
+
+            $payment->debt?->recalculateRemaining();
+        }
     }
 
     public function deleted(Transaction $transaction): void
@@ -38,6 +53,14 @@ class TransactionObserver
         }
 
         $this->applyEffects($transaction, revert: true);
+
+        // Transaksi cermin dari pembayaran utang dihapus -> batalkan juga
+        // catatan pembayarannya (yang otomatis mengembalikan sisa utang).
+        $payment = $transaction->debtPayment;
+
+        if ($payment) {
+            $payment->delete();
+        }
     }
 
     public function restored(Transaction $transaction): void

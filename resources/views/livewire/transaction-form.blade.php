@@ -94,6 +94,24 @@
                         </div>
                     </div>
 
+                    @if ($type !== 'transfer')
+                        <div>
+                            <label for="debt_id" class="block text-sm font-medium text-muted mb-2">Terhubung ke Utang/Piutang (opsional)</label>
+                            <select id="debt_id" wire:model="debt_id" class="w-full px-5 py-3 neo-inset-sm bg-surface text-text outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40 text-sm">
+                                <option value="">— Tanpa tautan —</option>
+                                @foreach ($debts as $debt)
+                                    @if (($type === 'expense' && $debt->direction === 'payable') || ($type === 'income' && $debt->direction === 'receivable'))
+                                        <option value="{{ $debt->id }}">{{ $debt->counterparty_name }} · sisa {{ \App\Support\Money::format($debt->remaining_amount) }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-muted">Pengeluaran mengurangi utang, pemasukan mengurangi piutang.</p>
+                            @error('debt_id')
+                                <p class="mt-1 text-sm text-danger">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    @endif
+
                     <div>
                         <label for="note" class="block text-sm font-medium text-muted mb-2">Catatan (opsional)</label>
                         <input id="note" type="text" wire:model="note" placeholder="cth. Belanja mingguan" class="w-full px-5 py-3 neo-inset-sm bg-surface text-text placeholder:text-muted/60 outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40 text-sm">

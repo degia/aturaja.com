@@ -11,6 +11,7 @@ use App\Models\DebtPayment;
 use App\Models\Liability;
 use App\Models\NetWorthSnapshot;
 use App\Models\User;
+use App\Models\Transaction;
 use App\Models\Workspace;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -162,6 +163,8 @@ class NetWorthDebtTest extends TestCase
 
         $this->get('/debts')->assertOk()->assertSee('Debt Tracker');
 
+        $account = $this->liquid(5_000_000, 'bank');
+
         $debt = Debt::create([
             'direction' => 'payable',
             'counterparty_name' => 'Bank',
@@ -172,10 +175,133 @@ class NetWorthDebtTest extends TestCase
 
         $this->post("/debts/{$debt->id}/payments", [
             'amount' => 500_000,
+            'account_id' => $account->id,
             'paid_at' => now()->format('Y-m-d'),
         ])->assertRedirect('/debts');
 
         $this->assertDatabaseHas('debt_payments', ['debt_id' => $debt->id, 'amount' => 500_000]);
         $this->assertSame(1_500_000.0, (float) $debt->refresh()->remaining_amount);
+    }
+
+    public function test_pembayaran_utang_mencatat_transaksi_dan_mengurangi_saldo_akun(): void
+    {
+        $account = $this->liquid(1_000_000, 'bank');
+
+        $debt = Debt::create([
+            'direction' => 'payable',
+            'counterparty_name' => 'Bank',
+            'principal_amount' => 400_000,
+            'remaining_amount' => 400_000,
+            'status' => 'ongoing',
+        ]);
+
+        $payment = DebtPayment::create([
+            'debt_id' => $debt->id,
+            'account_id' => $account->id,
+            'amount' => 400_000,
+            'paid_at' => '2026-08-10',
+            'note' => 'Cicilan bulanan',
+        ]);
+
+        $transaction = $payment->fresh()->transaction;
+
+        $this->assertTrue($payment->fresh()->transaction_id !== null);
+        $this->assertDatabaseHas('transactions', [
+            'id' => $transaction->id,
+            'type' => 'expense',
+            'amount' => '400000.00',
+            'account_id' => $account->id,
+            'transaction_date' => '2026-08-10',
+        ]);
+        $this->assertSame('400000.00', $transaction->amount);
+        $this->assertSame('expense', $transaction->type);
+        $this->assertSame(1_000_000.0 - 400_000.0, (float) $account->fresh()->balance);
+        $this->assertSame(0.0, (float) $debt->fresh()->remaining_amount);
+        $this->assertSame('paid', $debt->fresh()->status);
+    }
+
+    public function test_menghapus_pembayaran_membatalkan_transaksi_dan_status_utang_kembali(): void
+    {
+        $account = $this->liquid(1_000_000, 'bank');
+
+        $debt = Debt::create([
+            'direction' => 'payable',
+            'counterparty_name' => 'Budi',
+            'principal_amount' => 300_000,
+            'remaining_amount' => 300_000,
+            'status' => 'ongoing',
+        ]);
+
+        $payment = DebtPayment::create([
+            'debt_id' => $debt->id,
+            'account_id' => $account->id,
+            'amount' => 300_000,
+            'paid_at' => '2026-08-11',
+        ]);
+
+        $transaction = $payment->transaction;
+        $transactionId = $transaction->id;
+        $this->assertNotNull($transaction);
+
+        $payment->delete();
+
+        $this->assertNull(Transaction::find($transactionId));
+        $this->assertSame(1_000_000.0, (float) $account->fresh()->balance);
+        $this->assertSame(300_000.0, (float) $debt->fresh()->remaining_amount);
+        $this->assertSame('ongoing', $debt->fresh()->status);
+    }
+
+    public function test_tenor_menghasilkan_jadwal_cicilan_bulanan(): void
+    {
+        $debt = Debt::create([
+            'direction' => 'payable',
+            'counterparty_name' => 'Kredit Motor',
+            'principal_amount' => 300_000,
+            'remaining_amount' => 300_000,
+            'status' => 'ongoing',
+            'installments_count' => 3,
+            'first_due_date' => '2026-01-15',
+        ]);
+
+        $debt->generateSchedule();
+        $debt->refresh();
+
+        $this->assertSame(3, $debt->installments->count());
+        $this->assertSame(['2026-01-15', '2026-02-15', '2026-03-15'], $debt->installments->map(
+            fn ($i) => $i->due_date->format('Y-m-d')
+        )->all());
+        $this->assertSame(['100000.00', '100000.00', '100000.00'], $debt->installments->map(
+            fn ($i) => (string) $i->amount
+        )->all());
+    }
+
+    public function test_pembayaran_dialokasikan_ke_cicilan_secara_berurutan(): void
+    {
+        $account = $this->liquid(500_000, 'bank');
+
+        $debt = Debt::create([
+            'direction' => 'payable',
+            'counterparty_name' => 'Kredit Motor',
+            'principal_amount' => 300_000,
+            'remaining_amount' => 300_000,
+            'status' => 'ongoing',
+            'installments_count' => 3,
+            'first_due_date' => '2026-01-15',
+        ]);
+        $debt->generateSchedule();
+
+        DebtPayment::create([
+            'debt_id' => $debt->id,
+            'account_id' => $account->id,
+            'amount' => 150_000,
+            'paid_at' => '2026-01-20',
+        ]);
+
+        $debt->refresh();
+
+        $this->assertSame(['paid', 'partial', 'pending'], $debt->installments->pluck('status')->all());
+        $this->assertSame('100000.00', (string) $debt->installments[0]->amount_paid);
+        $this->assertSame('50000.00', (string) $debt->installments[1]->amount_paid);
+        $this->assertSame(150_000.0, (float) $debt->fresh()->remaining_amount);
     }
 }

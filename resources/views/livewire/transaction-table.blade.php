@@ -50,6 +50,9 @@
                                 {{ $transaction->account?->name }} → {{ $transaction->transferToAccount?->name }}
                             @else
                                 {{ $transaction->category?->name ?? 'Tanpa kategori' }}
+                                @if ($transaction->debtPayment)
+                                    <span class="ml-1 rounded-full bg-warning/10 px-2 py-0.5 text-[10px] font-bold text-warning" title="Pembayaran {{ $transaction->debtPayment->debt?->direction === 'payable' ? 'utang' : 'piutang' }}">UTANG</span>
+                                @endif
                             @endif
                         </p>
                         <p class="truncate text-xs text-muted">

@@ -81,7 +81,7 @@ class TransactionTable extends Component
     public function render()
     {
         return view('livewire.transaction-table', [
-            'transactions' => Transaction::with(['account', 'category', 'transferToAccount', 'tags'])
+            'transactions' => Transaction::with(['account', 'category', 'transferToAccount', 'tags', 'debtPayment.debt'])
                 ->when($this->search !== '', function ($query) {
                     $search = '%'.$this->search.'%';
 

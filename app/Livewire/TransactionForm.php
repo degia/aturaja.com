@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Account;
 use App\Models\Category;
+use App\Models\Debt;
+use App\Models\DebtPayment;
 use App\Models\Tag;
 use App\Models\Transaction;
 use Livewire\Attributes\On;
@@ -22,6 +24,8 @@ class TransactionForm extends Component
     public ?int $transfer_to_account_id = null;
 
     public ?int $category_id = null;
+
+    public ?int $debt_id = null;
 
     public string $amount = '';
 
@@ -44,9 +48,13 @@ class TransactionForm extends Component
     }
 
     #[On('edit-transaction')]
-    public function openEdit(array $payload): void
+    public function openEdit(mixed $id = null): void
     {
-        $transaction = Transaction::find($payload['id'] ?? null);
+        // Browser mengirim payload sebagai arg bernama (id: X),
+        // sedangkan test framework mengirim array terbungkus.
+        $id = is_array($id) ? ($id['id'] ?? null) : $id;
+
+        $transaction = Transaction::find($id);
 
         if (! $transaction) {
             return;
@@ -62,6 +70,7 @@ class TransactionForm extends Component
         $this->transaction_date = $transaction->transaction_date->format('Y-m-d');
         $this->note = $transaction->note;
         $this->tag_ids = $transaction->tags()->pluck('tags.id')->map(fn (int $id): int => $id)->all();
+        $this->debt_id = $transaction->debtPayment?->debt_id;
         $this->showForm = true;
     }
 
@@ -74,6 +83,7 @@ class TransactionForm extends Component
     {
         if ($value === 'transfer') {
             $this->category_id = null;
+            $this->debt_id = null;
         } else {
             $this->transfer_to_account_id = null;
         }
@@ -88,6 +98,7 @@ class TransactionForm extends Component
             'note' => ['nullable', 'string', 'max:255'],
             'tag_ids' => ['array'],
             'tag_ids.*' => ['integer', 'exists:tags,id'],
+            'debt_id' => ['nullable', 'integer', 'exists:debts,id'],
         ];
 
         if ($this->type === 'transfer') {
@@ -116,15 +127,52 @@ class TransactionForm extends Component
 
         $transaction = $this->editingId
             ? Transaction::findOrFail($this->editingId)
-            : new Transaction();
+            : new Transaction;
 
         $transaction->fill($data);
         $transaction->save();
         $transaction->tags()->sync($this->tag_ids);
 
+        $this->syncDebtLink($transaction);
+
         $this->resetForm();
         $this->showForm = false;
         $this->dispatch('transaction-saved');
+    }
+
+    private function syncDebtLink(Transaction $transaction): void
+    {
+        $debt = $this->debt_id ? Debt::find($this->debt_id) : null;
+
+        $canLink = $debt
+            && $this->type !== 'transfer'
+            && $debt->status !== 'paid'
+            && (
+                ($this->type === 'expense' && $debt->direction === 'payable')
+                || ($this->type === 'income' && $debt->direction === 'receivable')
+            );
+
+        $payment = $transaction->debtPayment;
+
+        if ($canLink) {
+            if (! $payment) {
+                DebtPayment::create([
+                    'debt_id' => $debt->id,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $transaction->account_id,
+                    'amount' => $transaction->amount,
+                    'paid_at' => $transaction->transaction_date,
+                    'note' => $transaction->note,
+                ]);
+            } elseif ($payment->debt_id !== $debt->id) {
+                $previousDebt = $payment->debt;
+                $payment->debt_id = $debt->id;
+                $payment->save();
+                $previousDebt?->recalculateRemaining();
+            }
+        } elseif ($payment) {
+            $payment->delete();
+        }
     }
 
     private function resetForm(): void
@@ -138,6 +186,7 @@ class TransactionForm extends Component
         $this->transaction_date = today()->format('Y-m-d');
         $this->note = null;
         $this->tag_ids = [];
+        $this->debt_id = null;
         $this->resetValidation();
     }
 
@@ -148,6 +197,7 @@ class TransactionForm extends Component
             'incomeCategories' => Category::income()->active()->orderBy('name')->get(),
             'expenseCategories' => Category::expense()->active()->orderBy('name')->get(),
             'tags' => Tag::orderBy('name')->get(),
+            'debts' => Debt::query()->where('status', '!=', 'paid')->orderBy('counterparty_name')->get(),
         ]);
     }
 }
