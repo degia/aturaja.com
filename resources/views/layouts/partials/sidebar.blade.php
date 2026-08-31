@@ -24,7 +24,7 @@
             ['label' => 'Transaksi Berulang', 'href' => route('recurring.index'), 'icon' => $iconClock],
             ['label' => 'Budgets', 'href' => route('budgets.index'), 'icon' => $iconPie],
             ['label' => 'Net Worth', 'href' => route('net-worth'), 'icon' => $iconBar],
-            ['label' => 'Reports', 'href' => '#', 'icon' => $iconScale],
+            ['label' => 'Reports', 'href' => route('reports.index'), 'icon' => $iconScale],
             ['label' => 'Debt Tracker', 'href' => route('debts.index'), 'icon' => $iconHeart],
         ],
         'Workspace' => [

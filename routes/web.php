@@ -10,6 +10,7 @@ use App\Http\Controllers\FinancialHealthController;
 use App\Http\Controllers\LiabilityController;
 use App\Http\Controllers\NetWorthController;
 use App\Http\Controllers\RecurringRuleController;
+use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UploadsController;
 use App\Http\Controllers\WorkspaceSettingsController;
@@ -36,6 +37,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::get('budgets', fn () => view('budgets.index'))->name('budgets.index');
 
     Route::get('net-worth', NetWorthController::class)->name('net-worth');
+    Route::get('reports', ReportsController::class)->name('reports.index');
     Route::get('financial-health', FinancialHealthController::class)->name('financial-health');
     Route::post('exports', [ExportController::class, 'store'])->name('exports.store');
     Route::get('exports', [ExportController::class, 'index'])->name('exports.index');
