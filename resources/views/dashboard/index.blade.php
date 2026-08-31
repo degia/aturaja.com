@@ -19,6 +19,11 @@
             <x-kpi-card label="Net Worth" value="{{ \App\Support\Money::format($kpis['netWorth']) }}" delta="Aset − Kewajiban" subtitle="Dari saldo akun aktif" tone="info" />
         </div>
 
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <x-kpi-card label="Saldo Aktif" value="{{ \App\Support\Money::format($kpis['activeBalance'] ?? 0) }}" delta="Kas likuid" subtitle="Tunai · Bank · E-Wallet" tone="info" />
+            <x-kpi-card label="Tabungan" value="{{ \App\Support\Money::format($kpis['saving']) }}" delta="Akun Tabungan" subtitle="Ditampilkan terpisah dari saldo aktif" tone="positive" />
+        </div>
+
         <livewire:dashboard-charts />
 
         <livewire:financial-health />

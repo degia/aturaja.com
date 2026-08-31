@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToWorkspace;
+use App\Support\BankLogos;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,14 +14,21 @@ class Account extends Model
 {
     use BelongsToWorkspace, HasFactory, SoftDeletes;
 
-    public const TYPES = ['cash', 'bank', 'ewallet', 'credit_card'];
+    public const TYPES = ['cash', 'bank', 'ewallet', 'saving', 'credit_card'];
 
     public const TYPE_LABELS = [
         'cash' => 'Tunai',
         'bank' => 'Bank',
         'ewallet' => 'E-Wallet',
+        'saving' => 'Tabungan',
         'credit_card' => 'Kartu Kredit',
     ];
+
+    /**
+     * Tipe akun yang masuk perhitungan "Saldo Aktif" (saldo kas yang likuid).
+     * Akun Tabungan dan Kartu Kredit tidak termasuk.
+     */
+    public const ACTIVE_BALANCE_TYPES = ['cash', 'bank', 'ewallet'];
 
     protected $fillable = [
         'name',
@@ -69,12 +77,12 @@ class Account extends Model
 
     public function hasUploadedIcon(): bool
     {
-        return \App\Support\BankLogos::isUploaded($this->icon);
+        return BankLogos::isUploaded($this->icon);
     }
 
     public function getLogoBadgeAttribute(): ?array
     {
-        return \App\Support\BankLogos::find($this->icon);
+        return BankLogos::find($this->icon);
     }
 
     public function getLogoUrlAttribute(): ?string

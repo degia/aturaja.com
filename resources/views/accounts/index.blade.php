@@ -22,11 +22,16 @@
             <x-neo-button variant="primary" href="{{ route('accounts.create') }}">+ Tambah Akun</x-neo-button>
         </div>
 
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <x-kpi-card
                 label="Total Saldo Aktif"
                 value="{{ \App\Support\Money::format($totalBalance) }}"
                 icon="💰"
+            />
+            <x-kpi-card
+                label="Total Tabungan"
+                value="{{ \App\Support\Money::format($totalSavingBalance) }}"
+                icon="🏦"
             />
             <x-kpi-card
                 label="Total Utang Kartu Kredit"
@@ -36,7 +41,7 @@
             <x-kpi-card
                 label="Jumlah Akun"
                 value="{{ $accounts->count() }}"
-                icon="🏦"
+                icon="📒"
             />
         </div>
 

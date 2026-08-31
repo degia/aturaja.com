@@ -19,10 +19,13 @@ class AccountController extends Controller
             ->orderBy('name')
             ->get();
 
-        $totalBalance = $accounts->where('is_archived', false)->where('type', '!=', 'credit_card')->sum('balance');
+        $totalBalance = $accounts->where('is_archived', false)
+            ->whereIn('type', Account::ACTIVE_BALANCE_TYPES)
+            ->sum('balance');
         $totalCreditBalance = $accounts->where('is_archived', false)->where('type', 'credit_card')->sum('balance');
+        $totalSavingBalance = $accounts->where('is_archived', false)->where('type', 'saving')->sum('balance');
 
-        return view('accounts.index', compact('accounts', 'totalBalance', 'totalCreditBalance'));
+        return view('accounts.index', compact('accounts', 'totalBalance', 'totalCreditBalance', 'totalSavingBalance'));
     }
 
     public function create(): View

@@ -10,8 +10,8 @@ use App\Models\Debt;
 use App\Models\DebtPayment;
 use App\Models\Liability;
 use App\Models\NetWorthSnapshot;
-use App\Models\User;
 use App\Models\Transaction;
+use App\Models\User;
 use App\Models\Workspace;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,7 +52,7 @@ class NetWorthDebtTest extends TestCase
         Asset::create(['name' => 'Emas', 'category' => 'investment_gold', 'current_value' => 20_000_000]);
         Liability::create(['name' => 'KPR', 'category' => 'mortgage', 'principal_remaining' => 300_000_000]);
 
-        $totals = (new NetWorthCalculator())->calculate();
+        $totals = (new NetWorthCalculator)->calculate();
 
         $this->assertSame(532_000_000.0, $totals['assets']);
         $this->assertSame(305_000_000.0, $totals['liabilities']);
@@ -70,7 +70,7 @@ class NetWorthDebtTest extends TestCase
             'linked_account_id' => $account->id,
         ]);
 
-        $totals = (new NetWorthCalculator())->calculate();
+        $totals = (new NetWorthCalculator)->calculate();
 
         // Hanya saldo akun yang dihitung, aset cash_bank ter-link tidak dihitung lagi
         $this->assertSame(7_000_000.0, $totals['assets']);
@@ -140,7 +140,7 @@ class NetWorthDebtTest extends TestCase
 
     public function test_dashboard_dan_halaman_net_worth_memakai_kalkulasi_yang_sama(): void
     {
-        $this->actingAs($workspaceUser = \App\Models\User::factory()->create());
+        $this->actingAs($workspaceUser = User::factory()->create());
         $workspaceUser->workspaces()->attach($this->workspace->id, ['role' => 'owner']);
         session(['current_workspace_id' => $this->workspace->id]);
 
@@ -157,7 +157,7 @@ class NetWorthDebtTest extends TestCase
 
     public function test_halaman_debt_tracker_merender_dan_mencatat_pembayaran(): void
     {
-        $this->actingAs($workspaceUser = \App\Models\User::factory()->create());
+        $this->actingAs($workspaceUser = User::factory()->create());
         $workspaceUser->workspaces()->attach($this->workspace->id, ['role' => 'owner']);
         session(['current_workspace_id' => $this->workspace->id]);
 
@@ -303,5 +303,31 @@ class NetWorthDebtTest extends TestCase
         $this->assertSame('100000.00', (string) $debt->installments[0]->amount_paid);
         $this->assertSame('50000.00', (string) $debt->installments[1]->amount_paid);
         $this->assertSame(150_000.0, (float) $debt->fresh()->remaining_amount);
+    }
+
+    public function test_saving_tidak_masuk_saldo_aktif_namun_terhitung_tabungan(): void
+    {
+        Account::create(['name' => 'Dompet', 'type' => 'cash', 'balance' => 100_000]);
+        Account::create(['name' => 'BCA', 'type' => 'bank', 'balance' => 500_000]);
+        Account::create(['name' => 'Tabungan Emas', 'type' => 'saving', 'balance' => 2_000_000]);
+
+        $user = User::whereHas('workspaces', fn ($q) => $q->whereKey($this->workspace->id))->first();
+        $this->actingAs($user)->get('/accounts')->assertStatus(200);
+
+        // Total Saldo Aktif tidak termasuk Tabungan (+ 100.000 + 500.000 = 600.000)
+        $this->assertSame(600_000.0, (float) Account::query()
+            ->active()
+            ->whereIn('type', Account::ACTIVE_BALANCE_TYPES)
+            ->sum('balance'));
+
+        // Total Tabungan terpisah
+        $this->assertSame(2_000_000.0, (float) Account::query()
+            ->active()
+            ->where('type', 'saving')
+            ->sum('balance'));
+
+        // Net worth memperlakukan tabungan sebagai aset (masuk total aset)
+        $totals = (new NetWorthCalculator)->calculate();
+        $this->assertSame(2_600_000.0, $totals['assets']);
     }
 }

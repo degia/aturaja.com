@@ -27,7 +27,7 @@ final class NetWorthCalculator
             ->sum('current_value');
 
         $liquidBalance = (float) Account::query()
-            ->whereIn('type', ['cash', 'bank', 'ewallet'])
+            ->whereIn('type', ['cash', 'bank', 'ewallet', 'saving'])
             ->sum('balance');
 
         $liabilities = (float) Liability::query()
