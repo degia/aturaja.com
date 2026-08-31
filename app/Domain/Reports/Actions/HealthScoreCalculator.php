@@ -230,9 +230,10 @@ class HealthScoreCalculator
      * Menggabungkan beban dari model Debt (kewajiban terbaru di Debt Tracker)
      * dengan model Liability legacy supaya tidak ada utang yang terlewat.
      *
-     * Untuk Debt dengan tenor: dihitung dari jumlah cicilan yang jatuh tempo di
-     * bulan referensi dan belum lunas. Untuk Debt tanpa tenor: memakai
-     * installment_amount sebagai beban bulanan manual.
+     * Untuk Debt berarah payable, nominal cicilan bulanan diambil dari
+     * installment_amount (hasil pembagian pokok per tenor atau nilai manual),
+     * sehingga DTI mencerminkan beban rutin dan tidak menjadi 0 ketika cicilan
+     * tengah bulan berjalan belum jatuh tempo.
      */
     private function monthlyDebtObligation($reference): float
     {
@@ -242,26 +243,12 @@ class HealthScoreCalculator
             $total += (float) $liability->monthly_installment;
         }
 
-        $monthStart = $reference->copy()->startOfMonth();
-        $monthEnd = $reference->copy()->endOfMonth();
-
-        foreach (Debt::query()->where('direction', 'payable')->with('installments')->get() as $debt) {
-            $hasTenor = (int) $debt->installments_count > 0;
-
-            if ($hasTenor) {
-                foreach ($debt->installments as $installment) {
-                    if ($installment->status === 'paid') {
-                        continue;
-                    }
-
-                    $due = $installment->due_date;
-                    if ($due >= $monthStart && $due <= $monthEnd) {
-                        $total += (float) $installment->amount;
-                    }
-                }
-            } else {
-                $total += (float) $debt->installment_amount;
+        foreach (Debt::query()->where('direction', 'payable')->get() as $debt) {
+            if ($debt->status === 'paid') {
+                continue;
             }
+
+            $total += (float) $debt->installment_amount;
         }
 
         return round($total, 2);
