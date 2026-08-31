@@ -32,7 +32,7 @@
             ['label' => 'Financial Health', 'href' => route('financial-health'), 'icon' => $iconHeart],
         ],
         'Management' => [
-            ['label' => 'Workspace Settings', 'href' => '#', 'icon' => $iconCog],
+            ['label' => 'Workspace Settings', 'href' => route('settings.index'), 'icon' => $iconCog],
             ['label' => 'Export & Reports History', 'href' => route('exports.index'), 'icon' => $iconExport],
             ['label' => 'Billing & Subscription', 'href' => '#', 'icon' => $iconCard],
         ],

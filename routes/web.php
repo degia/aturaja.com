@@ -12,6 +12,7 @@ use App\Http\Controllers\NetWorthController;
 use App\Http\Controllers\RecurringRuleController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UploadsController;
+use App\Http\Controllers\WorkspaceSettingsController;
 use App\Http\Controllers\WorkspaceSwitchController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,4 +58,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
     Route::post('recurring', [RecurringRuleController::class, 'store'])->name('recurring.store');
     Route::delete('recurring/{rule}', [RecurringRuleController::class, 'destroy'])->name('recurring.destroy');
     Route::get('recurring', [RecurringRuleController::class, 'index'])->name('recurring.index');
+
+    Route::get('settings/workspace', [WorkspaceSettingsController::class, 'edit'])->name('settings.index');
+    Route::patch('settings/workspace', [WorkspaceSettingsController::class, 'update'])->name('settings.update');
 });
