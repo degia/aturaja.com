@@ -15,6 +15,7 @@ class CategoryController extends Controller
     {
         $categories = Category::with('children')
             ->withCount(['children', 'transactions'])
+            ->whereNull('parent_id')
             ->orderBy('name')
             ->get();
 

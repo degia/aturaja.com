@@ -1,5 +1,14 @@
 <x-layouts.app title="Kategori & Tag" breadcrumb="Kategori & Tag">
-    <div class="flex flex-col gap-6">
+    @php
+        $allCategoryIds = collect();
+        foreach ($categories as $set) {
+            $allCategoryIds = $allCategoryIds->merge($set->pluck('id'));
+        }
+    @endphp
+    <div
+        class="flex flex-col gap-6"
+        x-data="{ openMap: @js($allCategoryIds->mapWithKeys(fn ($id) => [$id => true])->all()), setAll(open) { Object.keys(this.openMap).forEach(k => this.openMap[k] = open); } }"
+    >
         @if (session('status'))
             <div class="rounded-2xl bg-primary-soft p-4 text-sm font-medium text-primary-dark">{{ session('status') }}</div>
         @endif
@@ -23,7 +32,11 @@
                 <h1 class="text-2xl font-bold text-text">Kategori</h1>
                 <p class="mt-1 text-sm text-muted">Kelola kategori pemasukan & pengeluaran, serta tag.</p>
             </div>
-            <x-neo-button variant="primary" href="{{ route('categories.create') }}">+ Tambah Kategori</x-neo-button>
+            <div class="flex items-center gap-2">
+                <x-neo-button variant="ghost" type="button" @click="setAll(false)">Hide All</x-neo-button>
+                <x-neo-button variant="ghost" type="button" @click="setAll(true)">Show All</x-neo-button>
+                <x-neo-button variant="primary" href="{{ route('categories.create') }}">+ Tambah Kategori</x-neo-button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -38,6 +51,12 @@
                         @foreach ($categories[$type] ?? [] as $category)
                             <li>
                                 <div class="flex items-center gap-3 px-6 py-3">
+                                    @if ($category->children->isNotEmpty())
+                                        <button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl neo-card text-muted transition-all duration-200 ease-neo hover:-translate-y-0.5 hover:text-primary" @click="openMap[{{ $category->id }}] = !openMap[{{ $category->id }}]" title="{{ $category->name }} sub-kategori">
+                                            <x-heroicon-o-chevron-down x-show="openMap[{{ $category->id }}]" class="h-4 w-4" />
+                                            <x-heroicon-o-chevron-right x-show="!openMap[{{ $category->id }}]" x-cloak class="h-4 w-4" />
+                                        </button>
+                                    @endif
                                     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl neo-inset-sm" style="color: {{ $category->color }}">{{ $category->icon }}</div>
                                     <div class="min-w-0 flex-1">
                                         <p class="flex items-center gap-2 text-sm font-semibold text-text">
@@ -78,7 +97,7 @@
                                 </div>
 
                                 @if ($category->children->isNotEmpty())
-                                    <ul class="ml-9 border-l border-shadow-dark/40 pb-2">
+                                    <ul x-show="openMap[{{ $category->id }}]" x-collapse class="ml-9 border-l border-shadow-dark/40 pb-2">
                                         @foreach ($category->children as $child)
                                             <li class="flex items-center gap-3 px-6 py-2">
                                                 <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg neo-inset-sm text-sm" style="color: {{ $child->color }}">{{ $child->icon }}</div>
