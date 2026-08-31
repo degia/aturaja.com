@@ -29,6 +29,10 @@ class TransactionForm extends Component
 
     public string $amount = '';
 
+    public string $transfer_fee = '';
+
+    public ?int $transfer_fee_category_id = null;
+
     public string $transaction_date = '';
 
     public ?string $note = null;
@@ -103,6 +107,11 @@ class TransactionForm extends Component
 
         if ($this->type === 'transfer') {
             $rules['transfer_to_account_id'] = ['required', 'integer', 'different:account_id'];
+            $rules['transfer_fee'] = ['nullable', 'numeric', 'min:0'];
+
+            if ((float) ($this->transfer_fee ?? 0) > 0) {
+                $rules['transfer_fee_category_id'] = ['required', 'integer', 'exists:categories,id'];
+            }
         } else {
             $rules['category_id'] = ['required', 'integer'];
         }
@@ -134,10 +143,40 @@ class TransactionForm extends Component
         $transaction->tags()->sync($this->tag_ids);
 
         $this->syncDebtLink($transaction);
+        $this->syncTransferFee($transaction);
 
         $this->resetForm();
         $this->showForm = false;
         $this->dispatch('transaction-saved');
+    }
+
+    /**
+     * Untuk transfer (antar bank) yang baru dibuat, catat biaya admin sebagai
+     * transaksi expense terpisah (pengurang dari akun sumber) apabila nominal
+     * potongan diisi. Tidak dipicu saat mengubah transaksi agar tidak dobel.
+     */
+    private function syncTransferFee(Transaction $transaction): void
+    {
+        if ($this->type !== 'transfer' || $this->editingId) {
+            return;
+        }
+
+        $fee = (float) ($this->transfer_fee ?? 0);
+
+        if ($fee <= 0) {
+            return;
+        }
+
+        Transaction::create([
+            'type' => 'expense',
+            'amount' => $fee,
+            'transaction_date' => $transaction->transaction_date,
+            'account_id' => $transaction->account_id,
+            'category_id' => $this->transfer_fee_category_id,
+            'note' => $transaction->note
+                ? $transaction->note.' · Biaya admin transfer'
+                : 'Biaya admin transfer',
+        ]);
     }
 
     private function syncDebtLink(Transaction $transaction): void
@@ -183,6 +222,8 @@ class TransactionForm extends Component
         $this->transfer_to_account_id = null;
         $this->category_id = null;
         $this->amount = '';
+        $this->transfer_fee = '';
+        $this->transfer_fee_category_id = null;
         $this->transaction_date = today()->format('Y-m-d');
         $this->note = null;
         $this->tag_ids = [];

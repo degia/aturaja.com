@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\TransactionForm;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Tag;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,7 +52,7 @@ class TransactionFormTest extends TestCase
 
     public function test_event_open_transaction_form_membuka_modal_dengan_form_kosong(): void
     {
-        Livewire::test(\App\Livewire\TransactionForm::class)
+        Livewire::test(TransactionForm::class)
             ->call('save', ['amount' => '']) // placeholder to trigger validation state
             ->call('close')
             ->assertSet('showForm', false)
@@ -63,7 +65,7 @@ class TransactionFormTest extends TestCase
 
     public function test_event_edit_transaction_mengisi_form(): void
     {
-        $transaction = \App\Models\Transaction::create([
+        $transaction = Transaction::create([
             'account_id' => $this->cash->id,
             'category_id' => $this->food->id,
             'type' => 'expense',
@@ -73,7 +75,7 @@ class TransactionFormTest extends TestCase
         ]);
         $transaction->tags()->attach($this->tag);
 
-        Livewire::test(\App\Livewire\TransactionForm::class)
+        Livewire::test(TransactionForm::class)
             ->dispatch('edit-transaction', ['id' => $transaction->id])
             ->assertSet('showForm', true)
             ->assertSet('editingId', $transaction->id)
@@ -84,7 +86,7 @@ class TransactionFormTest extends TestCase
 
     public function test_simpan_income_membuat_transaksi_dan_menambah_saldo(): void
     {
-        Livewire::test(\App\Livewire\TransactionForm::class)
+        Livewire::test(TransactionForm::class)
             ->set('type', 'income')
             ->set('account_id', $this->bank->id)
             ->set('category_id', $this->salary->id)
@@ -104,7 +106,7 @@ class TransactionFormTest extends TestCase
 
     public function test_simpan_tanpa_akun_dan_nominal_memunculkan_error_validasi(): void
     {
-        Livewire::test(\App\Livewire\TransactionForm::class)
+        Livewire::test(TransactionForm::class)
             ->dispatch('open-transaction-form')
             ->assertSet('showForm', true)
             ->set('amount', '')
@@ -116,7 +118,7 @@ class TransactionFormTest extends TestCase
 
     public function test_transfer_memerlukan_akun_tujuan(): void
     {
-        Livewire::test(\App\Livewire\TransactionForm::class)
+        Livewire::test(TransactionForm::class)
             ->set('type', 'transfer')
             ->set('account_id', $this->cash->id)
             ->set('amount', '100000')
@@ -126,12 +128,62 @@ class TransactionFormTest extends TestCase
 
     public function test_transfer_tujuan_sama_dengan_akun_sumber_ditolak(): void
     {
-        Livewire::test(\App\Livewire\TransactionForm::class)
+        Livewire::test(TransactionForm::class)
             ->set('type', 'transfer')
             ->set('account_id', $this->cash->id)
             ->set('transfer_to_account_id', $this->cash->id)
             ->set('amount', '100000')
             ->call('save')
             ->assertHasErrors(['transfer_to_account_id' => 'different']);
+    }
+
+    public function test_transfer_dengan_biaya_admin_mencatat_pengeluaran(): void
+    {
+        $feeCategory = Category::create(['name' => 'Biaya Admin', 'type' => 'expense']);
+
+        Livewire::test(TransactionForm::class)
+            ->set('type', 'transfer')
+            ->set('account_id', $this->cash->id)
+            ->set('transfer_to_account_id', $this->bank->id)
+            ->set('amount', '100000')
+            ->set('transfer_fee', '6500')
+            ->set('transfer_fee_category_id', $feeCategory->id)
+            ->set('transaction_date', today()->format('Y-m-d'))
+            ->call('save')
+            ->assertDispatched('transaction-saved')
+            ->assertSet('showForm', false);
+
+        // Transfer mengurangi akun sumber & menambah akun tujuan
+        $this->assertDatabaseHas('transactions', [
+            'type' => 'transfer',
+            'account_id' => $this->cash->id,
+            'transfer_to_account_id' => $this->bank->id,
+            'amount' => 100_000,
+        ]);
+
+        // Biaya admin tercatat sebagai expense pada akun sumber
+        $this->assertDatabaseHas('transactions', [
+            'type' => 'expense',
+            'account_id' => $this->cash->id,
+            'category_id' => $feeCategory->id,
+            'amount' => 6_500,
+        ]);
+
+        // Saldo akhir: 100.000 - 100.000 (transfer) - 6.500 (biaya admin)
+        $this->assertSame(-6_500, (int) $this->cash->fresh()->balance);
+        $this->assertSame(100_000, (int) $this->bank->fresh()->balance);
+    }
+
+    public function test_transfer_dengan_biaya_admin_memerlukan_kategori(): void
+    {
+        Livewire::test(TransactionForm::class)
+            ->set('type', 'transfer')
+            ->set('account_id', $this->cash->id)
+            ->set('transfer_to_account_id', $this->bank->id)
+            ->set('amount', '100000')
+            ->set('transfer_fee', '6500')
+            ->set('transaction_date', today()->format('Y-m-d'))
+            ->call('save')
+            ->assertHasErrors(['transfer_fee_category_id' => 'required']);
     }
 }

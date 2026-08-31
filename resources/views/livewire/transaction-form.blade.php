@@ -94,6 +94,34 @@
                         </div>
                     </div>
 
+                    @if ($type === 'transfer')
+                        <div class="rounded-2xl neo-inset-sm p-4 space-y-4">
+                            <p class="text-sm font-semibold text-text">Biaya Admin (opsional)</p>
+                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <div>
+                                    <label for="transfer_fee" class="block text-sm font-medium text-muted mb-2">Nominal Potongan</label>
+                                    <input id="transfer_fee" type="number" step="0.01" min="0" wire:model="transfer_fee" placeholder="cth. 6500" class="w-full px-5 py-3 neo-inset-sm bg-surface text-text placeholder:text-muted/60 outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40 text-sm">
+                                    <p class="mt-1 text-xs text-muted">Dicatat sebagai transaksi pengeluaran (expense).</p>
+                                    @error('transfer_fee')
+                                        <p class="mt-1 text-sm text-danger">{{ $message }}</p>
+                                    @enderror
+                                    @error('transfer_fee_category_id')
+                                        <p class="mt-1 text-sm text-danger">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label for="transfer_fee_category_id" class="block text-sm font-medium text-muted mb-2">Kategori Biaya</label>
+                                    <select id="transfer_fee_category_id" wire:model="transfer_fee_category_id" class="w-full px-5 py-3 neo-inset-sm bg-surface text-text outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40 text-sm">
+                                        <option value="">— Pilih kategori —</option>
+                                        @foreach ($expenseCategories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     @if ($type !== 'transfer')
                         <div>
                             <label for="debt_id" class="block text-sm font-medium text-muted mb-2">Terhubung ke Utang/Piutang (opsional)</label>
