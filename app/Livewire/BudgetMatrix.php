@@ -38,14 +38,14 @@ class BudgetMatrix extends Component
     public function shift(int $direction): void
     {
         $this->saved = false;
-        $this->periodMonth = Carbon::createFromFormat('Y-m', $this->periodMonth)->addMonths($direction)->format('Y-m');
+        $this->periodMonth = Carbon::createFromFormat('!Y-m', $this->periodMonth)->addMonths($direction)->format('Y-m');
         $this->hydrateInputs();
     }
 
     public function copyFromPreviousMonth(): void
     {
         $this->saved = false;
-        $current = Carbon::createFromFormat('Y-m', $this->periodMonth);
+        $current = Carbon::createFromFormat('!Y-m', $this->periodMonth);
         $previous = $current->copy()->subMonth()->format('Y-m-01');
 
         foreach (Budget::query()->forPeriod($previous)->get() as $prev) {
@@ -56,7 +56,7 @@ class BudgetMatrix extends Component
 
     public function save(): void
     {
-        $firstDay = Carbon::createFromFormat('Y-m', $this->periodMonth)->startOfMonth()->format('Y-m-d');
+        $firstDay = Carbon::createFromFormat('!Y-m', $this->periodMonth)->startOfMonth()->format('Y-m-d');
 
         foreach ($this->limits as $categoryId => $limit) {
             $limit = (float) ($limit ?? 0);
@@ -83,8 +83,8 @@ class BudgetMatrix extends Component
 
     public function render()
     {
-        $report = new BudgetReport();
-        $firstDay = Carbon::createFromFormat('Y-m', $this->periodMonth)->startOfMonth()->format('Y-m-d');
+        $report = new BudgetReport;
+        $firstDay = Carbon::createFromFormat('!Y-m', $this->periodMonth)->startOfMonth()->format('Y-m-d');
         $rows = $report->forMonth($this->periodMonth);
 
         $categories = Category::query()
@@ -95,7 +95,7 @@ class BudgetMatrix extends Component
             ->get();
 
         return view('livewire.budget-matrix', [
-            'periodLabel' => Carbon::createFromFormat('Y-m', $this->periodMonth)->translatedFormat('F Y'),
+            'periodLabel' => Carbon::createFromFormat('!Y-m', $this->periodMonth)->translatedFormat('F Y'),
             'periodFirstDay' => $firstDay,
             'rows' => $rows,
             'totalLimit' => (float) $rows->sum('limit'),
@@ -109,7 +109,7 @@ class BudgetMatrix extends Component
     {
         $this->limits = [];
         $this->thresholds = [];
-        $firstDay = Carbon::createFromFormat('Y-m', $this->periodMonth)->startOfMonth()->format('Y-m-d');
+        $firstDay = Carbon::createFromFormat('!Y-m', $this->periodMonth)->startOfMonth()->format('Y-m-d');
 
         foreach (Budget::query()->forPeriod($firstDay)->get() as $budget) {
             $this->limits[$budget->category_id] = (string) (float) $budget->limit_amount;

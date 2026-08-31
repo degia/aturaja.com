@@ -46,7 +46,7 @@ class DashboardCharts extends Component
             $this->customFrom = $month->copy()->addMonths($direction)->startOfMonth()->format('Y-m-d');
             $this->customTo = $month->copy()->addMonths($direction)->endOfMonth()->format('Y-m-d');
         } else {
-            $ref = Carbon::createFromFormat('Y-m', $this->anchor ?: now()->format('Y-m'))->addMonths($direction);
+            $ref = Carbon::createFromFormat('!Y-m', $this->anchor ?: now()->format('Y-m'))->addMonths($direction);
             $this->anchor = $ref->format('Y-m');
         }
 
@@ -65,8 +65,8 @@ class DashboardCharts extends Component
         $prevTo = $from->copy()->subDay();
         $prevFrom = $prevTo->copy()->subDays($length - 1);
 
-        $cashFlow = new CashFlowReport();
-        $breakdown = new ExpenseBreakdownReport();
+        $cashFlow = new CashFlowReport;
+        $breakdown = new ExpenseBreakdownReport;
 
         $totals = $cashFlow->totals($from, $to);
         $previous = $cashFlow->totals($prevFrom, $prevTo);
@@ -115,8 +115,8 @@ class DashboardCharts extends Component
 
         return match ($this->granularity) {
             'day' => [
-                Carbon::createFromFormat('Y-m', $this->anchor ?: $now->format('Y-m'))->startOfMonth(),
-                Carbon::createFromFormat('Y-m', $this->anchor ?: $now->format('Y-m'))->endOfMonth(),
+                Carbon::createFromFormat('!Y-m', $this->anchor ?: $now->format('Y-m'))->startOfMonth(),
+                Carbon::createFromFormat('!Y-m', $this->anchor ?: $now->format('Y-m'))->endOfMonth(),
             ],
             'year' => [
                 Carbon::create((int) ($this->anchor ?: $now->year), 1, 1),
@@ -127,8 +127,8 @@ class DashboardCharts extends Component
                 $this->customTo ? Carbon::parse($this->customTo)->endOfDay() : $now->copy()->endOfMonth(),
             ],
             default => [
-                Carbon::createFromFormat('Y-m', $this->anchor ?: $now->format('Y-m'))->startOfMonth()->subMonths(11),
-                Carbon::createFromFormat('Y-m', $this->anchor ?: $now->format('Y-m'))->endOfMonth(),
+                Carbon::createFromFormat('!Y-m', $this->anchor ?: $now->format('Y-m'))->startOfMonth()->subMonths(11),
+                Carbon::createFromFormat('!Y-m', $this->anchor ?: $now->format('Y-m'))->endOfMonth(),
             ],
         };
     }
