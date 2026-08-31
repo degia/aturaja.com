@@ -24,9 +24,8 @@ class DashboardCharts extends Component
         $this->anchor = now()->format('Y-m');
     }
 
-    public function setGranularity(string $granularity): void
+    public function setGranularity(): void
     {
-        $this->granularity = in_array($granularity, ['day', 'month', 'year', 'custom'], true) ? $granularity : 'month';
         $this->selectedCategoryId = null;
     }
 
