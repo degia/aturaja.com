@@ -113,7 +113,7 @@
                                     <label for="transfer_fee_category_id" class="block text-sm font-medium text-muted mb-2">Kategori Biaya</label>
                                     <select id="transfer_fee_category_id" wire:model="transfer_fee_category_id" class="w-full px-5 py-3 neo-inset-sm bg-surface text-text outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40 text-sm">
                                         <option value="">— Pilih kategori —</option>
-                                        @foreach ($expenseCategories as $category)
+                                        @foreach ($transferFeeCategories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>

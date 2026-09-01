@@ -214,6 +214,40 @@ class TransactionForm extends Component
         }
     }
 
+    /**
+     * Kategori yang valid untuk biaya admin transfer: hanya kategori "Biaya
+     * Administrasi" beserta seluruh sub-kategorinya (sedalam apapun).
+     */
+    private function transferFeeCategories(): \Illuminate\Support\Collection
+    {
+        $roots = Category::query()
+            ->active()
+            ->where('name', 'Biaya Administrasi')
+            ->get();
+
+        if ($roots->isEmpty()) {
+            return collect();
+        }
+
+        $result = $roots->keyBy('id');
+        $pending = $roots->pluck('id');
+
+        while ($pending->isNotEmpty()) {
+            $children = Category::query()
+                ->active()
+                ->whereIn('parent_id', $pending)
+                ->get();
+
+            foreach ($children as $child) {
+                $result->put($child->id, $child);
+            }
+
+            $pending = $children->pluck('id');
+        }
+
+        return $result->sortBy('name')->values();
+    }
+
     private function resetForm(): void
     {
         $this->editingId = null;
@@ -237,6 +271,7 @@ class TransactionForm extends Component
             'accounts' => Account::active()->orderBy('name')->get(),
             'incomeCategories' => Category::income()->active()->orderBy('name')->get(),
             'expenseCategories' => Category::expense()->active()->orderBy('name')->get(),
+            'transferFeeCategories' => $this->transferFeeCategories(),
             'tags' => Tag::orderBy('name')->get(),
             'debts' => Debt::query()->where('status', '!=', 'paid')->orderBy('counterparty_name')->get(),
         ]);
