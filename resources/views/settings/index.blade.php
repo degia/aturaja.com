@@ -98,5 +98,84 @@
                 </ul>
             </x-neo-card>
         </div>
+
+        <x-neo-card>
+            <h2 class="mb-1 text-lg font-semibold text-text">Backup & Recovery</h2>
+            <p class="mb-6 text-sm text-muted">Buat salinan data workspace atau pulihkan dari backup dalam format JSON.</p>
+
+            @if ($errors->any())
+                <div class="mb-4 rounded-2xl bg-danger/10 p-4 text-sm text-danger">
+                    <ul class="list-inside list-disc space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (auth()->id() === $workspace->owner_user_id)
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <div>
+                        <h3 class="mb-3 font-semibold text-text">Buat Backup</h3>
+                        <p class="mb-4 text-sm text-muted">Pilih cakupan data yang ingin disalin, lalu unduh sebagai file JSON.</p>
+
+                        <form method="POST" action="{{ route('backups.backup') }}" class="flex flex-col gap-4">
+                            @csrf
+
+                            <div>
+                                <label for="backup-scope" class="mb-2 block text-sm font-medium text-muted">Cakupan Backup</label>
+                                <select
+                                    id="backup-scope"
+                                    name="scope"
+                                    class="w-full rounded-[14px] neo-inset-sm bg-surface px-5 py-3 text-sm text-text outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40"
+                                >
+                                    <option value="full">Full data (seluruh catatan transaksi & keuangan)</option>
+                                    <option value="settings">Settings saja (akun, kategori, tag, aturan berulang, budget)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <x-neo-button type="submit" variant="primary">
+                                    <x-heroicon-o-arrow-down-tray class="h-4 w-4" /> Unduh Backup
+                                </x-neo-button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3 class="mb-3 font-semibold text-text">Restore / Recovery</h3>
+                        <p class="mb-4 text-sm text-muted">
+                            Unggah file backup JSON untuk mengganti data workspace yang ada. Operasi ini <span class="font-semibold text-danger">menimpa seluruh data</span> sesuai cakupan backup.
+                        </p>
+
+                        <form method="POST" action="{{ route('backups.restore') }}" enctype="multipart/form-data" class="flex flex-col gap-4">
+                            @csrf
+
+                            <div>
+                                <label for="backup-file" class="mb-2 block text-sm font-medium text-muted">File Backup (JSON)</label>
+                                <input
+                                    id="backup-file"
+                                    type="file"
+                                    name="backup"
+                                    accept=".json,.txt,application/json"
+                                    class="w-full rounded-[14px] neo-inset-sm bg-surface px-5 py-3 text-sm text-text outline-none transition-all duration-200 focus:ring-2 focus:ring-primary/40 file:mr-3 file:rounded-lg file:border-0 file:bg-primary-soft file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary-dark"
+                                />
+                                @error('backup')
+                                    <p class="mt-1 text-sm text-danger">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <x-neo-button type="submit" variant="danger">
+                                    <x-heroicon-o-arrow-path class="h-4 w-4" /> Restore Data
+                                </x-neo-button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @else
+                <p class="text-sm text-muted">Hanya pemilik workspace yang dapat membuat backup dan me-restore data.</p>
+            @endif
+        </x-neo-card>
     </div>
 </x-layouts.app>

@@ -1,5 +1,9 @@
 <x-layouts.app title="Dashboard" breadcrumb="Dashboard">
     <div class="flex flex-col gap-6">
+        @if (session('status'))
+            <div class="rounded-2xl bg-primary-soft p-4 text-sm font-medium text-primary-dark">{{ session('status') }}</div>
+        @endif
+
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-text">Ringkasan Keuangan</h1>

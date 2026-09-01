@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\BackupsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
@@ -63,4 +64,7 @@ Route::middleware(['auth', 'tenant'])->group(function () {
 
     Route::get('settings/workspace', [WorkspaceSettingsController::class, 'edit'])->name('settings.index');
     Route::patch('settings/workspace', [WorkspaceSettingsController::class, 'update'])->name('settings.update');
+
+    Route::post('settings/backup', [BackupsController::class, 'backup'])->name('backups.backup');
+    Route::post('settings/restore', [BackupsController::class, 'restore'])->name('backups.restore');
 });
