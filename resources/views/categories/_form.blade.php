@@ -2,6 +2,7 @@
 
 @php
     $old = static fn (string $field, $default = null) => old($field, $category?->{$field} ?? $default);
+    $initialIcon = \App\Support\CategoryIcons::resolve($old('icon')) ?? '';
 @endphp
 
 <div x-data="{ type: @js(old('type', $category->type ?? 'expense')) }">
@@ -32,10 +33,36 @@
     </div>
 
     <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div>
-            <x-neo-input label="Ikon (opsional)" name="icon" value="{{ $old('icon') }}" placeholder="cth. 🍜 / 💰" maxlength="32" />
+        <div class="md:col-span-2">
+            <span class="block text-sm font-medium text-muted mb-2">Ikon (opsional)</span>
+            <div class="grid grid-cols-6 gap-2 sm:grid-cols-9" x-data="{ icon: @js($initialIcon) }">
+                <button
+                    type="button"
+                    @click="icon = ''"
+                    class="flex aspect-square items-center justify-center rounded-xl neo-inset-sm text-muted transition-all duration-200 hover:-translate-y-0.5"
+                    :class="icon === '' ? 'ring-2 ring-primary text-text' : ''"
+                    title="Tanpa ikon"
+                >
+                    <span class="text-xs font-semibold">—</span>
+                </button>
+                @foreach (\App\Support\CategoryIcons::ICONS as $name => $label)
+                    <button
+                        type="button"
+                        @click="icon = icon === '{{ $name }}' ? '' : '{{ $name }}'"
+                        class="flex aspect-square items-center justify-center rounded-xl neo-inset-sm transition-all duration-200 hover:-translate-y-0.5"
+                        :class="icon === '{{ $name }}' ? 'ring-2 ring-primary' : ''"
+                        title="{{ $label }}"
+                    >
+                        <i data-lucide="{{ $name }}" class="h-5 w-5" style="color:#111827"></i>
+                    </button>
+                @endforeach
+                <input type="hidden" name="icon" :value="icon">
+            </div>
+            <p class="mt-1 text-xs text-muted">Pilih ikon gaya garis hitam. Klik lagi untuk menghapus pilihan.</p>
         </div>
+    </div>
 
+    <div class="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
             <x-neo-input label="Warna (opsional)" name="color" value="{{ $old('color') }}" placeholder="cth. #F97316" maxlength="20" />
         </div>

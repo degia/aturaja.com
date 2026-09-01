@@ -57,7 +57,7 @@
                                             <x-heroicon-o-chevron-right x-show="!openMap[{{ $category->id }}]" x-cloak class="h-4 w-4" />
                                         </button>
                                     @endif
-                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl neo-inset-sm" style="color: {{ $category->color }}">{{ $category->icon }}</div>
+                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl neo-inset-sm"><x-category-icon :icon="$category->icon" class="h-5 w-5" /></div>
                                     <div class="min-w-0 flex-1">
                                         <p class="flex items-center gap-2 text-sm font-semibold text-text">
                                             {{ $category->name }}
@@ -100,7 +100,7 @@
                                     <ul x-show="openMap[{{ $category->id }}]" x-collapse class="ml-9 border-l border-shadow-dark/40 pb-2">
                                         @foreach ($category->children as $child)
                                             <li class="flex items-center gap-3 px-6 py-2">
-                                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg neo-inset-sm text-sm" style="color: {{ $child->color }}">{{ $child->icon }}</div>
+                                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg neo-inset-sm text-sm"><x-category-icon :icon="$child->icon" class="h-4 w-4" /></div>
                                                 <p class="min-w-0 flex-1 truncate text-sm text-muted">{{ $child->name }}</p>
                                             </li>
                                         @endforeach

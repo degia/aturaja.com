@@ -117,5 +117,20 @@
 </div>
 
 <livewire:scripts />
+
+<script src="{{ \App\Support\CategoryIcons::CDN }}"></script>
+<script>
+    const renderLucide = () => {
+        if (window.lucide) window.lucide.createIcons();
+    };
+    document.addEventListener('DOMContentLoaded', renderLucide);
+    window.addEventListener('load', renderLucide);
+    document.addEventListener('livewire:init', () => {
+        Livewire.hook('morph.updated', ({ el }) => {
+            if (el && el.querySelector('[data-lucide]')) renderLucide();
+        });
+        renderLucide();
+    });
+</script>
 </body>
 </html>
