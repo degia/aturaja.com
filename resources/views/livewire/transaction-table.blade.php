@@ -59,9 +59,7 @@
             @forelse ($transactions as $transaction)
                 <div class="flex flex-wrap items-center gap-4 border-b border-shadow-dark/20 px-6 py-4">
                     <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl neo-inset-sm">
-                        <span class="text-lg">
-                            {{ $transaction->type === 'income' ? '📥' : ($transaction->type === 'transfer' ? '🔁' : '📤') }}
-                        </span>
+                        <x-transaction-type-icon :type="$transaction->type" class="h-5 w-5" />
                     </div>
 
                     <div class="min-w-0 flex-1">
