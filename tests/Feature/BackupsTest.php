@@ -106,7 +106,8 @@ class BackupsTest extends TestCase
         $file = UploadedFile::fake()->createWithContent('backup.json', json_encode($payload));
 
         $this->actingAs($user)->post('/settings/restore', ['backup' => $file])
-            ->assertRedirect();
+            ->assertRedirect(route('dashboard'))
+            ->assertSessionHas('status');
 
         $this->assertSame(1, Transaction::count());
         $this->assertDatabaseHas('transactions', ['amount' => 50_000, 'note' => 'test']);
@@ -133,7 +134,7 @@ class BackupsTest extends TestCase
 
         $file = UploadedFile::fake()->createWithContent('backup.json', json_encode($payload));
 
-        $this->actingAs($user)->post('/settings/restore', ['backup' => $file])->assertRedirect();
+        $this->actingAs($user)->post('/settings/restore', ['backup' => $file])->assertRedirect(route('dashboard'));
 
         $this->assertDatabaseHas('workspaces', ['id' => $workspace->id, 'name' => 'Keuangan Pribadi', 'currency' => 'IDR']);
         $this->assertDatabaseHas('tags', ['name' => 'rutin']);
@@ -142,24 +143,25 @@ class BackupsTest extends TestCase
         $this->assertDatabaseHas('accounts', ['name' => 'Bank', 'balance' => 50_000]);
     }
 
-    public function test_restore_menolak_backup_workspace_lain(): void
+    public function test_restore_dari_backup_workspace_lain_berhasil(): void
     {
         $user = User::factory()->create();
         $other = User::factory()->create();
 
         $workspace = $this->workspace($user);
-        $this->workspace($other, 'Workspace Lain');
+        $otherWorkspace = $this->workspace($other, 'Workspace Lain');
+        $this->seedData($workspace);
 
         // Backup diambil milik workspace milik user.
         session(['current_workspace_id' => $workspace->id]);
-
-        $response = $this->actingAs($user)->post('/settings/backup', ['scope' => 'full']);
+        $response = $this->actingAs($user)->post('/settings/backup', ['scope' => 'full'])->assertOk();
         $payload = json_decode($response->streamedContent(), true);
 
+        // Restore ke workspace milik user lain (semua akun) harus berhasil.
+        session(['current_workspace_id' => $otherWorkspace->id]);
         $file = UploadedFile::fake()->createWithContent('backup.json', json_encode($payload));
 
-        $this->actingAs($other)->post('/settings/restore', ['backup' => $file])
-            ->assertSessionHasErrors('backup');
+        $this->actingAs($other)->post('/settings/restore', ['backup' => $file])->assertRedirect(route('dashboard'));
     }
 
     public function test_restore_menolak_file_bukan_backup(): void
@@ -171,5 +173,33 @@ class BackupsTest extends TestCase
 
         $this->actingAs($user)->post('/settings/restore', ['backup' => $file])
             ->assertSessionHasErrors('backup');
+    }
+
+    public function test_restore_tidak_bentrok_id_saat_target_sudah_berisi_data(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+
+        $workspace = $this->workspace($user);
+        $this->seedData($workspace);
+        session(['current_workspace_id' => $workspace->id]);
+        $response = $this->actingAs($user)->post('/settings/backup', ['scope' => 'full'])->assertOk();
+        $payload = json_decode($response->streamedContent(), true);
+
+        // Target sudah punya akun sendiri (id-nya bisa sama dgn id akun lama backup).
+        $otherWorkspace = $this->workspace($other, 'Target');
+        $existing = Account::create(['name' => 'Akun Lama', 'type' => 'bank', 'balance' => 999]);
+
+        // Restore backup dari workspace lain ke target yang sudah berisi data.
+        session(['current_workspace_id' => $otherWorkspace->id]);
+        $file = UploadedFile::fake()->createWithContent('backup.json', json_encode($payload));
+
+        $this->actingAs($other)->post('/settings/restore', ['backup' => $file])->assertRedirect(route('dashboard'));
+
+        // Restore tetap berhasil + mengganti data target tanpa error duplicate key.
+        $this->assertDatabaseHas('accounts', ['name' => 'Bank', 'workspace_id' => $otherWorkspace->id]);
+        $this->assertDatabaseHas('transactions', ['note' => 'test', 'workspace_id' => $otherWorkspace->id]);
+        // Akun lama milik target dihapus (replace-total).
+        $this->assertDatabaseMissing('accounts', ['id' => $existing->id]);
     }
 }

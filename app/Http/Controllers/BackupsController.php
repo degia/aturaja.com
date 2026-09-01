@@ -50,6 +50,6 @@ class BackupsController extends Controller
             return back()->withErrors(['backup' => 'Restore gagal: data tidak diubah. ('.$e->getMessage().')']);
         }
 
-        return back()->with('status', 'Data workspace berhasil dipulihkan dari backup.');
+        return redirect()->route('dashboard')->with('status', 'Data berhasil dipulihkan dari backup. Dashboard telah diperbarui dengan data terbaru.');
     }
 }
