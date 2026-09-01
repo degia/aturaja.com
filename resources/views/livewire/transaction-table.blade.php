@@ -1,4 +1,23 @@
 <div>
+    @if ($accounts->isNotEmpty())
+        <div class="mb-6 flex flex-wrap items-stretch gap-4">
+            @foreach ($accounts as $account)
+                <x-neo-card hover class="w-full !p-5 sm:w-auto sm:min-w-52 sm:flex-1">
+                    <div class="flex items-center gap-3">
+                        <x-account-logo :icon="$account->icon" :logo-url="$account->logo_url" size="h-10 w-10" radius="rounded-xl" />
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-semibold text-text">{{ $account->name }}</p>
+                            <p class="text-xs text-muted">{{ $account->type_label }}</p>
+                        </div>
+                    </div>
+                    <p class="mt-3 text-sm font-bold {{ $account->type === 'credit_card' ? 'text-danger' : 'text-text' }}">
+                        {{ $account->type === 'credit_card' ? '-' : '' }}{{ \App\Support\Money::format($account->balance) }}
+                    </p>
+                </x-neo-card>
+            @endforeach
+        </div>
+    @endif
+
     <x-neo-card class="!p-0">
         <div class="flex flex-wrap items-center gap-3 border-b border-shadow-dark/40 px-6 py-4">
             <div class="relative min-w-52 flex-1">
@@ -14,6 +33,7 @@
                     @foreach ($accounts as $account)
                         <option value="{{ $account->id }}">{{ $account->name }}</option>
                     @endforeach
+
                 </select>
 
                 <select wire:model.live="categoryFilter" class="rounded-[14px] neo-inset-sm bg-surface px-3 py-2.5 text-sm text-text outline-none focus:ring-2 focus:ring-primary/40">
