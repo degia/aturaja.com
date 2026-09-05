@@ -26,11 +26,14 @@ class ReportsController extends Controller
         $cashFlow = new CashFlowReport;
         $expenseBreakdown = new ExpenseBreakdownReport;
         $totals = $cashFlow->totals($from, $to);
+        $trend = $cashFlow->trend('day', $from, $to);
 
         return view('reports.index', [
             'month' => $reference->format('Y-m'),
             'totals' => $totals,
-            'trend' => $cashFlow->trend('day', $from, $to),
+            'trendLabels' => $trend->pluck('label')->all(),
+            'trendIncome' => $trend->pluck('income')->map(fn ($v) => round((float) $v, 2))->all(),
+            'trendExpense' => $trend->pluck('expense')->map(fn ($v) => round((float) $v, 2))->all(),
             'expenseByCategory' => $expenseBreakdown->byCategory($from, $to),
             'expenseTotal' => (float) $totals['expense'],
         ]);

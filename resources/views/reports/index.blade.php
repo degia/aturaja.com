@@ -34,27 +34,13 @@
                     <h3 class="font-semibold text-text">Tren Arus Kas Harian</h3>
                     <div class="flex items-center gap-4 text-xs text-muted">
                         <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-primary"></span> Pemasukan</span>
-                        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-danger/70"></span> Pengeluaran</span>
+                        <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full" style="background: rgba(220,38,38,.7)"></span> Pengeluaran</span>
                     </div>
                 </div>
 
                 @if ($totals['income'] > 0 || $totals['expense'] > 0)
-                    @php
-                        $max = max($trend->max('income'), $trend->max('expense'), 1);
-                    @endphp
-                    <div class="flex items-end gap-1.5 overflow-x-auto pb-1">
-                        @foreach ($trend as $point)
-                            @php
-                                $dayLabel = \Carbon\Carbon::parse($point['key'])->format('d');
-                            @endphp
-                            <div class="flex min-w-[14px] flex-1 flex-col items-center gap-1">
-                                <div class="flex flex-col items-center gap-0.5">
-                                    <div class="w-full max-w-[10px] rounded-t bg-primary/80" style="height: {{ max((float) $point['income'] / $max * 100, 2) }}px" title="Pemasukan {{ \App\Support\Money::format($point['income']) }}"></div>
-                                    <div class="w-full max-w-[10px] rounded-b bg-danger/70" style="height: {{ max((float) $point['expense'] / $max * 100, 2) }}px" title="Pengeluaran {{ \App\Support\Money::format($point['expense']) }}"></div>
-                                </div>
-                                <span class="text-[10px] text-muted">{{ $dayLabel }}</span>
-                            </div>
-                        @endforeach
+                    <div class="relative h-72">
+                        <canvas x-init="AturjaCharts.renderTrendLine($el, { labels: @js($trendLabels), income: @js($trendIncome), expense: @js($trendExpense) })"></canvas>
                     </div>
                 @else
                     <div class="flex h-64 items-center justify-center rounded-2xl neo-inset">
@@ -78,7 +64,7 @@
                                     <span class="font-semibold text-text">{{ \App\Support\Money::format($item['amount']) }}</span>
                                     <span class="w-12 text-right text-xs text-muted">{{ number_format($item['percentage'], 1) }}%</span>
                                 </div>
-                                <div class="h-2 w-full overflow-hidden rounded-full bg-surface-muted/60">
+                                <div class="h-2 w-full overflow-hidden rounded-full bg-white/40">
                                     <div class="h-full rounded-full" style="width: {{ $item['percentage'] }}%; background: {{ $item['color'] }}"></div>
                                 </div>
                             </li>
