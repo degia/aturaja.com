@@ -3,536 +3,1347 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AturAja.com — Dashboard Preview</title>
+<title>AturAja.com — Preview Aplikasi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
   :root{
-    --bg:#EAF3EC; --surface:#F2F8F4; --surface-2:#EDF6F0;
-    --shadow-light:#FFFFFF; --shadow-dark:#C6D6CB;
-    --primary:#16A34A; --primary-dark:#0F7A38; --primary-soft:#DCFCE7;
-    --text:#16241C; --text-muted:#6B8074; --text-faint:#93A79A;
-    --danger:#DC2626; --warning:#D97706;
-    --radius-lg:22px; --radius-md:14px; --radius-sm:10px;
+    --bg:#EAF3EC;
+    --surface:#F2F8F4;
+    --shadow-light:#FFFFFF;
+    --shadow-dark:#C6D6CB;
+    --primary:#16A34A;
+    --primary-dark:#15803D;
+    --primary-soft:#DCFCE7;
+    --text:#1C2B22;
+    --text-muted:#6B8074;
+    --danger:#DC2626;
+    --warning:#D97706;
+    --radius-lg:20px;
+    --radius-md:14px;
     --ease:cubic-bezier(.4,0,.2,1);
-    --sb-w:264px; --sb-w-collapsed:84px;
   }
   *{box-sizing:border-box;}
+  html{font-family:'Inter',ui-sans-serif,system-ui,sans-serif;}
   body{
     margin:0; background:var(--bg); color:var(--text);
-    font-family:'Manrope',system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
+    -webkit-font-smoothing:antialiased; font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
   }
-  .mono{font-family:'JetBrains Mono',monospace;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
   ::selection{background:var(--primary-soft);}
+  [hidden]{display:none !important;}
 
-  /* ---------- Neomorphism primitives ---------- */
-  .neo{
+  /* ---------- Neomorphism primitives (sesuai app.css) ---------- */
+  .neo-card{
+    background:var(--surface); border-radius:var(--radius-lg);
+    box-shadow:8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    transition:transform 200ms var(--ease), box-shadow 200ms var(--ease);
+  }
+  .neo-card--hover:hover{ transform:translateY(-2px); box-shadow:12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light); }
+  .neo-inset{ background:var(--surface); border-radius:var(--radius-md); box-shadow:inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+  .neo-inset-sm{ background:var(--surface); border-radius:var(--radius-md); box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
+  .neo-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 24px; border-radius:14px; border:none; cursor:pointer;
+    font-family:inherit; font-weight:600; font-size:14px; color:var(--text);
+    box-shadow:8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    transition:all 200ms var(--ease);
     background:var(--surface);
-    border-radius:var(--radius-lg);
-    box-shadow:9px 9px 18px var(--shadow-dark), -9px -9px 18px var(--shadow-light);
-    transition:box-shadow .25s var(--ease), transform .2s var(--ease);
   }
-  .neo-sm{
-    background:var(--surface);
-    border-radius:var(--radius-md);
-    box-shadow:6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-  }
-  .neo-inset{
-    background:var(--surface-2);
-    border-radius:var(--radius-md);
-    box-shadow:inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light);
-  }
-  .neo-flat{
-    background:var(--surface);
-    border-radius:var(--radius-md);
-    box-shadow:3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
-  }
-  .neo-hover:hover{ transform:translateY(-3px); box-shadow:12px 12px 22px var(--shadow-dark), -12px -12px 22px var(--shadow-light); }
-  .neo-press:active{ box-shadow:inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); transform:translateY(0); }
+  .neo-btn:hover{ transform:translateY(-2px); box-shadow:12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light); }
+  .neo-btn:active{ transform:translateY(0); box-shadow:inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+  .neo-btn.primary{ background:var(--primary); color:#fff; }
+  .neo-btn.danger{ background:var(--danger); color:#fff; }
+  .neo-btn.sm{ padding:8px 14px; font-size:13px; }
 
-  .btn-primary{
-    background:linear-gradient(145deg, #1BB454, var(--primary));
-    color:#fff; border:none; border-radius:var(--radius-md);
-    box-shadow:6px 6px 14px rgba(15,122,56,.28), -4px -4px 10px rgba(255,255,255,.5);
-    transition:transform .18s var(--ease), box-shadow .18s var(--ease);
+  input,select,textarea{ font-family:inherit; }
+  .field{
+    width:100%; border:none; background:var(--surface); color:var(--text);
+    padding:11px 14px; border-radius:14px; outline:none; font-size:14px;
+    box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
   }
-  .btn-primary:hover{ transform:translateY(-2px); box-shadow:9px 9px 18px rgba(15,122,56,.32), -4px -4px 10px rgba(255,255,255,.5); }
-  .btn-primary:active{ transform:translateY(0); box-shadow:inset 3px 3px 8px rgba(0,0,0,.2); }
+  .field:focus{ box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light), 0 0 0 2px rgba(22,163,74,.4); }
+  .field-lbl{ display:block; font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:6px; }
 
   /* ---------- Layout ---------- */
   .app{ display:flex; min-height:100vh; }
 
   .sidebar{
-    width:var(--sb-w); flex-shrink:0; padding:22px 16px;
-    display:flex; flex-direction:column; gap:22px;
-    transition:width .28s var(--ease);
-    position:relative; z-index:20;
+    width:256px; flex-shrink:0; position:fixed; inset:0 auto 0 0; z-index:50;
+    display:flex; flex-direction:column; background:var(--surface);
+    box-shadow:8px 0 16px -8px var(--shadow-dark);
+    transition:width .2s var(--ease);
   }
-  .sidebar.collapsed{ width:var(--sb-w-collapsed); }
+  .sidebar.collapsed{ width:96px; }
+  .side-inner{ display:flex; flex-direction:column; height:100%; overflow:hidden; }
 
-  .brand{ display:flex; align-items:center; gap:12px; padding:4px 8px; }
+  .brand{ display:flex; align-items:center; gap:12px; padding:0 20px; height:64px; flex-shrink:0; }
   .brand-mark{
-    width:40px; height:40px; border-radius:12px; flex-shrink:0;
-    background:linear-gradient(145deg,#22C55E,var(--primary-dark));
+    width:40px; height:40px; border-radius:16px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
+    font-weight:800; color:#fff; font-size:13px;
+    background:linear-gradient(145deg,#22C55E,var(--primary-dark));
     box-shadow:4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light);
   }
-  .brand-text{ overflow:hidden; white-space:nowrap; transition:opacity .2s var(--ease), width .28s var(--ease); }
+  .brand-text{ min-width:0; white-space:nowrap; overflow:hidden; transition:opacity .2s,width .2s var(--ease); }
+  .brand-text .t{ font-size:16px; font-weight:700; line-height:1.2; }
+  .brand-text .s{ font-size:11px; font-weight:500; color:var(--text-muted); line-height:1.2; }
   .sidebar.collapsed .brand-text{ opacity:0; width:0; }
 
-  .nav-group-label{
-    font-size:11px; font-weight:700; letter-spacing:.08em; color:var(--text-faint);
-    padding:0 12px; margin-top:6px; white-space:nowrap; overflow:hidden;
-    transition:opacity .2s var(--ease);
+  nav{ flex:1; overflow-y:auto; padding:8px 12px 16px; }
+  .nav-group{ margin-bottom:20px; }
+  .nav-group > p{
+    font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-muted); padding:0 12px 8px; margin:0;
   }
-  .sidebar.collapsed .nav-group-label{ opacity:0; height:0; margin:0; }
-
+  .sidebar.collapsed .nav-group > p{ display:none; }
   .nav-item{
     position:relative; display:flex; align-items:center; gap:12px;
-    padding:11px 14px; border-radius:var(--radius-md); cursor:pointer;
-    color:var(--text-muted); font-weight:600; font-size:14.5px;
-    transition:background .2s var(--ease), color .2s var(--ease), transform .15s var(--ease);
-    white-space:nowrap; overflow:hidden;
+    padding:12px 14px; border-radius:14px; cursor:pointer;
+    color:var(--text-muted); font-weight:500; font-size:14px; white-space:nowrap;
+    transition:all .2s var(--ease);
   }
-  .nav-item:hover{ background:var(--surface-2); color:var(--text); transform:translateX(2px); }
-  .nav-item.active{ background:var(--surface); color:var(--primary-dark); box-shadow:4px 4px 10px var(--shadow-dark), -4px -4px 10px var(--shadow-light); }
+  .nav-item:hover{ color:var(--text); background:var(--surface); }
   .nav-item .bar{
-    position:absolute; left:-16px; top:8px; bottom:8px; width:4px; border-radius:4px;
-    background:var(--primary); transform:scaleY(0); transition:transform .25s var(--ease);
+    position:absolute; left:4px; top:50%; transform:translateY(-50%);
+    height:24px; width:4px; border-radius:99px; background:var(--primary);
+    opacity:0; transition:opacity .2s var(--ease);
   }
-  .nav-item.active .bar{ transform:scaleY(1); }
-  .nav-item svg{ flex-shrink:0; width:19px; height:19px; }
-  .nav-label{ transition:opacity .2s var(--ease); }
+  .nav-item.active{ color:var(--primary-dark); background:var(--primary-soft); }
+  .nav-item.active .bar{ opacity:1; }
   .sidebar.collapsed .nav-item{ justify-content:center; padding:12px; }
-  .sidebar.collapsed .nav-label{ display:none; }
-  .sidebar.collapsed .nav-item:hover{ transform:none; }
+  .nav-item .ic{ flex-shrink:0; width:20px; height:20px; }
+  .label-l{ overflow:hidden; white-space:nowrap; }
+  .sidebar.collapsed .label-l{ display:none; }
+  .label-l.hide-collapsed{ display:inline; }
 
-  .sidebar-toggle{
-    width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center;
-    cursor:pointer; color:var(--text-muted); flex-shrink:0;
+  .side-foot{ border-top:1px solid rgba(198,214,203,.4); padding:14px 12px; flex-shrink:0; }
+  .ws-box{ display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px; cursor:pointer; }
+  .ws-box:hover{ background:var(--surface); }
+  .ws-opt{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; cursor:pointer; font-size:14px; }
+  .ws-opt:hover{ background:rgba(234,243,236,.9); color:var(--text); }
+  .d-dot{ width:8px; height:8px; border-radius:99px; display:inline-block; flex-shrink:0; }
+  .avatar{ width:40px; height:40px; border-radius:14px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--primary-dark); background:linear-gradient(145deg,#BEE9C9,#8FDDA5); }
+  .log-btn{ display:flex; align-items:center; gap:12px; padding:12px 12px; border-radius:14px; color:var(--text-muted); cursor:pointer; font-size:14px; }
+  .log-btn:hover{ color:var(--danger); background:var(--surface); }
+
+  .main{
+    flex:1; margin-left:256px; min-width:0;
+    display:flex; flex-direction:column; transition:margin-left .2s var(--ease);
   }
-  .sidebar-toggle:hover{ color:var(--primary-dark); }
-  .sidebar-toggle svg{ transition:transform .28s var(--ease); }
-  .sidebar.collapsed .sidebar-toggle svg{ transform:rotate(180deg); }
+  .app.sidebar-collapsed .main{ margin-left:96px; }
 
-  .main{ flex:1; min-width:0; padding:22px 26px 40px; }
+  .topbar{
+    position:sticky; top:0; z-index:30; height:72px; flex-shrink:0;
+    display:flex; align-items:center; gap:12px; padding:0 32px;
+    border-bottom:1px solid rgba(198,214,203,.4); background:rgba(234,243,236,.85); backdrop-filter:blur(8px);
+  }
+  .icon-btn{
+    width:40px; height:40px; border-radius:14px; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; color:var(--text-muted);
+    background:var(--surface); box-shadow:8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    flex-shrink:0; transition:all .2s var(--ease);
+  }
+  .icon-btn:hover{ transform:translateY(-2px); color:var(--text); }
+  .breadcrumb{ display:flex; align-items:center; gap:8px; font-size:14px; min-width:0; }
+  .breadcrumb a{ color:var(--text-muted); text-decoration:none; font-weight:500; }
+  .breadcrumb a:hover{ color:var(--primary); }
+  .breadcrumb .sep{ color:rgba(107,128,116,.6); }
+  .breadcrumb .cur{ font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .top-right{ margin-left:auto; display:flex; align-items:center; gap:16px; }
+  .bell{ position:relative; }
+  .bell .badge{ position:absolute; top:-3px; right:-3px; min-width:16px; height:16px; padding:0 4px; border-radius:99px; background:var(--danger); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
 
-  .topbar{ display:flex; align-items:center; gap:16px; margin-bottom:22px; }
-  .search-box{ flex:1; max-width:380px; display:flex; align-items:center; gap:10px; padding:11px 16px; color:var(--text-faint); }
-  .search-box input{ border:none; background:transparent; outline:none; color:var(--text); font-family:inherit; width:100%; font-size:14px; }
-  .icon-btn{ width:42px; height:42px; border-radius:14px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); cursor:pointer; position:relative; flex-shrink:0; }
-  .icon-btn:hover{ color:var(--primary-dark); }
-  .dot{ position:absolute; top:9px; right:10px; width:7px; height:7px; border-radius:99px; background:var(--danger); }
+  main{ flex:1; padding:32px 32px 40px; }
+  .page{ display:none; flex-direction:column; gap:24px; }
+  .page.active{ display:flex; }
 
-  .avatar{ width:42px; height:42px; border-radius:14px; background:linear-gradient(145deg,#BEE9C9,#8FDDA5); display:flex; align-items:center; justify-content:center; font-weight:800; color:var(--primary-dark); flex-shrink:0; }
+  .hdr{ display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:16px; }
+  .hdr h1{ font-size:24px; font-weight:700; margin:0; color:var(--text); }
+  .hdr .sub{ color:var(--text-muted); font-size:14px; margin:4px 0 0; }
+  .hdr-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 
-  h1{ font-size:26px; font-weight:800; margin:0 0 4px; letter-spacing:-.01em; }
-  .sub{ color:var(--text-muted); font-size:14px; margin:0; }
+  /* KPI */
+  .kpi-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .kpi-grid.cols-3{ grid-template-columns:repeat(3,1fr); }
+  .kpi-grid.cols-2{ grid-template-columns:repeat(2,1fr); }
+  .kpi-grid.cols-5{ grid-template-columns:repeat(5,1fr); }
+  .kpi{ padding:24px; }
+  .kpi .label{ font-size:14px; font-weight:500; color:var(--text-muted); }
+  .kpi .value{ margin-top:8px; font-size:24px; font-weight:700; color:var(--text); }
+  .kpi .delta{ margin-top:8px; font-size:14px; font-weight:600; }
+  .kpi .sub{ margin-top:2px; font-size:12px; }
+  .t-positive{ color:var(--primary); } .t-neg{ color:var(--danger); } .t-info{ color:#0284C7; } .t-muted{ color:var(--text-muted); }
 
-  .header-row{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px; gap:16px; flex-wrap:wrap; }
-  .pill-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .pill{ padding:9px 15px; border-radius:12px; font-size:13.5px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:6px; }
-  .pill:hover{ color:var(--text); }
-  .pill.export{ color:var(--primary-dark); }
-
-  .kpi-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:20px; }
-  .kpi{ padding:20px; }
-  .kpi-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
-  .kpi-label{ font-size:13.5px; color:var(--text-muted); font-weight:600; }
-  .kpi-icon{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--primary-dark); background:var(--primary-soft); }
-  .kpi-value{ font-size:25px; font-weight:800; letter-spacing:-.01em; }
-  .kpi-delta{ display:flex; align-items:center; gap:5px; font-size:12.5px; font-weight:700; margin-top:8px; color:var(--primary-dark); }
-  .kpi-delta.down{ color:var(--danger); }
-
-  .charts-row{ display:grid; grid-template-columns:2fr 1fr; gap:18px; margin-bottom:20px; align-items:stretch; }
-  .card-title{ font-size:16px; font-weight:800; }
+  .card{ padding:24px; }
+  .sec-head{
+    background:var(--surface); border-radius:var(--radius-lg);
+    box-shadow:8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+    padding:16px 24px;
+  }
+  .card-title{ font-size:16px; font-weight:600; color:var(--text); }
   .card-sub{ font-size:13px; color:var(--text-muted); margin-top:2px; }
-  .chart-card{ padding:22px; }
-  .chart-head{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; flex-wrap:wrap; gap:12px; }
-  .tab-pill-group{ display:flex; gap:4px; padding:4px; border-radius:12px; background:var(--surface-2); }
-  .tab-pill{ padding:7px 13px; font-size:12.5px; font-weight:700; border-radius:9px; color:var(--text-muted); cursor:pointer; transition:all .2s var(--ease); }
-  .tab-pill.active{ background:var(--surface); color:var(--primary-dark); box-shadow:2px 2px 6px var(--shadow-dark), -2px -2px 6px var(--shadow-light); }
-  .legend-dot{ width:8px; height:8px; border-radius:99px; display:inline-block; margin-right:6px; }
+  .card-head{ display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:16px; }
 
-  .lower-row{ display:grid; grid-template-columns:1.3fr 1fr; gap:18px; }
+  /* Controls */
+  .controls{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .sel{ box-shadow:inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light); }
 
-  .table-card{ padding:0; overflow:hidden; }
-  .table-head{ display:flex; justify-content:space-between; align-items:center; padding:20px 22px 14px; flex-wrap:wrap; gap:12px; }
-  table{ width:100%; border-collapse:collapse; }
-  thead th{ text-align:left; font-size:11.5px; letter-spacing:.05em; color:var(--text-faint); font-weight:700; padding:10px 22px; text-transform:uppercase; }
-  tbody td{ padding:14px 22px; font-size:13.5px; border-top:1px solid rgba(198,214,203,.5); }
-  tbody tr{ transition:background .18s var(--ease); }
-  tbody tr:hover{ background:var(--surface-2); }
-  .cat-badge{ display:inline-flex; align-items:center; gap:7px; padding:5px 10px; border-radius:9px; background:var(--surface-2); font-size:12.5px; font-weight:600; }
-  .amt-in{ color:var(--primary-dark); font-weight:700; }
-  .amt-out{ color:var(--danger); font-weight:700; }
-  .status{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; }
-  .status .dot2{ width:6px; height:6px; border-radius:99px; background:var(--primary); }
+  .summary-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .summary-box{ border-radius:14px; padding:16px; }
+  .summary-box .t{ font-size:12px; font-weight:500; color:var(--text-muted); }
+  .summary-box .v{ margin-top:4px; font-weight:700; color:var(--text); }
+  .summary-box .d{ margin-top:2px; font-size:11px; }
 
-  .budget-card{ padding:22px; display:flex; flex-direction:column; gap:16px; }
-  .budget-item{ display:flex; flex-direction:column; gap:7px; }
-  .budget-item-top{ display:flex; justify-content:space-between; font-size:13.5px; font-weight:700; }
-  .budget-item-top span.muted{ color:var(--text-muted); font-weight:600; font-size:12.5px; }
-  .track{ height:9px; border-radius:99px; background:var(--surface-2); box-shadow:inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); overflow:hidden; }
+  .chart-grid{ display:grid; grid-template-columns:2fr 1fr; gap:24px; align-items:stretch; }
+  .dough-wrap{ height:200px; display:flex; align-items:center; justify-content:center; }
+  .legend-dot{ width:10px; height:10px; border-radius:99px; display:inline-block; }
+
+  /* Table / list rows */
+  .list{ overflow:hidden; }
+  .row{ display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:16px 24px; border-bottom:1px solid rgba(198,214,203,.2); }
+  .row:last-child{ border-bottom:0; }
+  .row-head{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:16px 24px; border-bottom:1px solid rgba(198,214,203,.4); }
+
+  .ic-box{ width:44px; height:44px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:9px; font-size:12px; font-weight:600; }
+  .badge-red{ background:rgba(220,38,38,.1); color:var(--danger); }
+  .badge-green{ background:rgba(22,163,74,.15); color:var(--primary); }
+  .badge-yellow{ background:rgba(217,119,6,.12); color:var(--warning); }
+  .badge-muted{ background:var(--surface); color:var(--text-muted); }
+  .tag-pill{ border-radius:99px; padding:2px 8px; font-size:10px; font-weight:600; }
+
+  .track{ height:9px; border-radius:99px; overflow:hidden; box-shadow:inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); background:var(--surface); }
   .fill{ height:100%; border-radius:99px; transition:width 1s var(--ease); }
   .fill.green{ background:linear-gradient(90deg,#22C55E,var(--primary-dark)); }
   .fill.yellow{ background:linear-gradient(90deg,#FBBF24,var(--warning)); }
   .fill.red{ background:linear-gradient(90deg,#F87171,var(--danger)); }
 
-  @media (max-width:1180px){
-    .kpi-grid{ grid-template-columns:repeat(2,1fr); }
-    .charts-row{ grid-template-columns:1fr; }
-    .lower-row{ grid-template-columns:1fr; }
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .grid-13{ display:grid; grid-template-columns:1fr 3fr; gap:20px; }
+  .grid-23{ display:grid; grid-template-columns:2fr 1fr; gap:24px; }
+  .stack{ display:flex; flex-direction:column; gap:16px; }
+
+  .alert{ border-radius:16px; padding:14px 18px; font-size:14px; }
+  .alert-warn{ background:rgba(217,119,6,.1); color:var(--warning); }
+  .alert-ok{ background:var(--primary-soft); color:var(--primary-dark); }
+
+  details.budget-details{ border-top:1px solid rgba(198,214,203,.2); }
+  details.budget-details summary{ list-style:none; cursor:pointer; padding:12px 24px; font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  details.budget-details summary::-webkit-details-marker{ display:none; }
+  details.budget-details summary::before{ content:'▸'; transition:transform .2s var(--ease); color:var(--text-muted); }
+  details.budget-details[open] summary::before{ transform:rotate(90deg); }
+
+  .stat-tbl{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .stat-tbl th{ text-align:left; font-size:11px; letter-spacing:.05em; color:var(--text-muted); font-weight:700; padding:10px 24px; text-transform:uppercase; }
+  .stat-tbl td{ padding:12px 24px; border-top:1px solid rgba(198,214,203,.25); }
+  .stat-tbl th.r, .stat-tbl td.r{ text-align:right; }
+
+  .grid-mid{ grid-template-columns:repeat(3,1fr); gap:20px; align-items:stretch; }
+  .ratio-row{ display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:16px 20px; border-radius:16px; }
+
+  /* kartu ringkasan akun (transactions) */
+  .account-cards{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:stretch; }
+  .account-cards > .neo-card{ padding:20px; display:flex; flex-direction:column; justify-content:space-between; }
+
+  /* baris anggaran responsif */
+  .budget-row{ display:grid; grid-template-columns:auto 1fr auto 120px 120px; gap:16px; align-items:center; }
+  .budget-row .b-main{ min-width:0; }
+  .budget-inputs{ display:flex; gap:12px; }
+  .budget-inputs > div{ flex:1; min-width:100px; }
+
+  @media (max-width:1200px){
+    .account-cards{ grid-template-columns:repeat(2,1fr); }
+    .budget-row{ grid-template-columns:1fr; }
+    .budget-row .b-status{ justify-self:start; }
+    .budget-row .budget-inputs{ grid-column:auto; }
+  }
+
+  /* Financial health score ring */
+  .ring{
+    width:160px; height:160px; border-radius:50%; flex-shrink:0;
+    background:conic-gradient(#16A34A calc(var(--pct)*1%), #e5e7eb 0);
+    display:grid; place-items:center;
+  }
+  .ring-inner{
+    width:128px; height:128px; border-radius:50%;
+    background:var(--surface); display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+  }
+
+  /* global section spacing inside pages */
+  .gap-5{ gap:20px; } .gap-6{ gap:24px; }
+  .label-l .hide-collapsed{ display:inline; }
+  .sidebar.collapsed .label-l{ display:none; }
+  .sidebar.collapsed .side-foot .label-l{ display:none; }
+
+  /* nilai KPI panjang jangan overflow / terpotong */
+  .kpi .value{ overflow-wrap:anywhere; word-break:break-word; }
+
+  /* backdrop mobile untuk sidebar */
+  .mobile-overlay{
+    display:none; position:fixed; inset:0; z-index:45;
+    background:rgba(28,43,34,.35); backdrop-filter:blur(2px);
+  }
+  body.mobile-nav-open .mobile-overlay{ display:block; }
+
+  /* ----- Responsive breakpoints ----- */
+  @media (max-width:1200px){
+    .kpi-grid, .kpi-grid.cols-3, .kpi-grid.cols-4, .kpi-grid.cols-5{ grid-template-columns:repeat(2,1fr); }
+    .summary-grid{ grid-template-columns:repeat(2,1fr); }
+    .chart-grid, .grid-23, .grid-13, .grid-mid{ grid-template-columns:1fr; }
+    .grid-2, .grid-3{ grid-template-columns:repeat(2,1fr); }
+    .grid-13 > .stack, .grid-mid > .stack{ grid-column:auto !important; }
+  }
+  @media (max-width:900px){
+    .grid-2, .grid-3, .grid-mid{ grid-template-columns:1fr; }
+    /* health: kolom rasio turun di bawah ring tanpa span */
+    .grid-mid > .stack{ grid-column:auto !important; }
+    .chart-grid .chart-side{ width:100%; }
+    .ratio-row{ align-items:flex-start; }
   }
   @media (max-width:760px){
-    .sidebar{ position:fixed; height:100vh; left:0; top:0; background:var(--bg); }
-    .kpi-grid{ grid-template-columns:1fr; }
+    .kpi-grid, .kpi-grid.cols-2, .kpi-grid.cols-3, .kpi-grid.cols-4, .kpi-grid.cols-5,
+    .summary-grid, .grid-2, .grid-3, .grid-13, .grid-23, .grid-mid, .account-cards{ grid-template-columns:1fr !important; }
+
+    .sidebar{ transform:translateX(-100%); box-shadow:none; }
+    .sidebar.mobile-open{ transform:none; box-shadow:8px 0 24px -8px var(--shadow-dark); }
+    .main{ margin-left:0 !important; }
+    .topbar{ padding:0 16px; height:60px; }
+    main{ padding:20px 16px; }
+    .hdr h1{ font-size:20px; }
+    .hdr-actions{ width:100%; }
+    .hdr-actions .neo-btn{ flex:1 1 auto; }
+
+    /* card padding diperkecil di layar kecil */
+    .card{ padding:18px; }
+    .row, .row-head{ padding-left:16px; padding-right:16px; }
+    .chart-grid > div{ overflow:hidden; }
+
+    /* filter transaksi jadi vertikal penuh */
+    .filter-row{ flex-direction:column; align-items:stretch !important; }
+    .filter-row .search-field{ width:100% !important; min-width:0 !important; flex-basis:auto !important; }
+    .filter-controls{ width:100%; }
+    .filter-controls select.field, .filter-controls input.field{ width:100% !important; }
   }
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
 
-  <!-- SIDEBAR -->
+  <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="brand-mark">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 17L9 11L13 15L21 7" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 7H21V13" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div class="brand-text">
-        <div style="font-weight:800;font-size:16.5px;">AturAja<span style="color:var(--primary-dark)">.com</span></div>
-        <div style="font-size:11px;color:var(--text-muted);">Kelola Uangmu, Aja.</div>
-      </div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:20px;flex:1;overflow-y:auto;">
-      <div>
-        <div class="nav-group-label">MAIN MENU</div>
-        <div class="nav-item active"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>
-          <span class="nav-label">Dashboard</span>
-        </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M7 15h3M3 6h18v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Z"/></svg>
-          <span class="nav-label">Transactions</span>
-        </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-          <span class="nav-label">Accounts &amp; Wallets</span>
-        </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
-          <span class="nav-label">Budgets</span>
-        </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg>
-          <span class="nav-label">Reports</span>
-        </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 8V6a4 4 0 0 0-8 0v2M6 8h12l1 12H5L6 8Z"/></svg>
-          <span class="nav-label">Debt Tracker</span>
+    <div class="side-inner">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div class="brand-text">
+          <div class="t">AturAja<span style="color:var(--primary-dark)">.com</span></div>
+          <div class="s">Atur uangmu, aja.</div>
         </div>
       </div>
 
-      <div>
-        <div class="nav-group-label">WORKSPACE</div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12.9 12 21.5l-8.6-8.6a4.5 4.5 0 0 1 6.4-6.4L12 8l2.2-2.5a4.5 4.5 0 1 1 6.4 6.4Z"/></svg>
-          <span class="nav-label">Categories &amp; Tags</span>
+      <nav>
+        <div class="nav-group">
+          <p>Main Menu</p>
+          <div class="nav-item active" data-page="dashboard"><span class="bar"></span><span class="ic">▦</span><span class="label-l">Dashboard</span></div>
+          <div class="nav-item" data-page="transactions"><span class="bar"></span><span class="ic">⇄</span><span class="label-l">Transactions</span></div>
+          <div class="nav-item" data-page="accounts"><span class="bar"></span><span class="ic">◈</span><span class="label-l">Accounts &amp; Wallets</span></div>
+          <div class="nav-item" data-page="recurring"><span class="bar"></span><span class="ic">◷</span><span class="label-l">Transaksi Berulang</span></div>
+          <div class="nav-item" data-page="budgets"><span class="bar"></span><span class="ic">◔</span><span class="label-l">Budgets</span></div>
+          <div class="nav-item" data-page="networth"><span class="bar"></span><span class="ic">▂</span><span class="label-l">Net Worth</span></div>
+          <div class="nav-item" data-page="reports"><span class="bar"></span><span class="ic">⚖</span><span class="label-l">Reports</span></div>
+          <div class="nav-item" data-page="debts"><span class="bar"></span><span class="ic">♥</span><span class="label-l">Debt Tracker</span></div>
         </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 5 2 8h6c0-3 2-5 2-8a5 5 0 0 0-5-5Z"/><path d="M9 21h6M10 18h4"/></svg>
-          <span class="nav-label">Financial Health</span>
-        </div>
-      </div>
 
-      <div>
-        <div class="nav-group-label">MANAGEMENT</div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
-          <span class="nav-label">Workspace Settings</span>
+        <div class="nav-group">
+          <p>Workspace</p>
+          <div class="nav-item" data-page="categories"><span class="bar"></span><span class="ic">⌘</span><span class="label-l">Categories &amp; Tags</span></div>
+          <div class="nav-item" data-page="health"><span class="bar"></span><span class="ic">❦</span><span class="label-l">Financial Health</span></div>
         </div>
-        <div class="nav-item"><span class="bar"></span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v6M8 21h8M3 3h18v9a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V3Z"/></svg>
-          <span class="nav-label">Export History</span>
-        </div>
-      </div>
-    </div>
 
-    <div class="neo-sm" style="padding:12px;display:flex;align-items:center;gap:12px;">
-      <div class="avatar" style="width:36px;height:36px;font-size:13px;">GP</div>
-      <div class="brand-text" style="flex:1;">
-        <div style="font-weight:700;font-size:13.5px;">Gia Pasaribu</div>
-        <div style="font-size:11px;color:var(--text-muted);">Personal Workspace</div>
+        <div class="nav-group">
+          <p>Management</p>
+          <div class="nav-item" data-page="settings"><span class="bar"></span><span class="ic">⚙</span><span class="label-l">Workspace Settings</span></div>
+          <div class="nav-item" data-page="exports"><span class="bar"></span><span class="ic">⇩</span><span class="label-l">Export &amp; Reports History</span></div>
+          <div class="nav-item" data-page="billing"><span class="bar"></span><span class="ic">✦</span><span class="label-l">Billing &amp; Subscription</span></div>
+        </div>
+      </nav>
+
+      <div class="side-foot">
+        <div style="position:relative;">
+          <div id="wsBox" class="ws-box" onclick="toggleWorkspace(this)">
+            <div class="avatar">GP</div>
+            <div class="label-l">
+              <div class="ws-name" style="font-weight:600;font-size:13.5px;">Gia Pasaribu</div>
+              <div class="ws-sub" style="font-size:11px;color:var(--text-muted);">Personal Workspace</div>
+            </div>
+            <span class="label-l" style="color:var(--text-muted);">▾</span>
+          </div>
+          <div id="wsDropdown" class="neo-card" style="display:none;position:absolute;bottom:100%;left:0;right:0;margin-bottom:8px;padding:8px;z-index:60;">
+            <p style="margin:0;padding:6px 10px 6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);">Workspace Anda</p>
+            <div class="ws-opt" data-sub="Personal Workspace" onclick="switchWorkspace('Personal Workspace',this)"><span class="d-dot" style="background:var(--primary)"></span>Personal Workspace</div>
+            <div class="ws-opt" data-sub="Bisnis Kecil" onclick="switchWorkspace('Bisnis Kecil',this)"><span class="d-dot" style="background:rgba(107,128,116,.4)"></span>Bisnis Kecil</div>
+          </div>
+        </div>
+        <div class="log-btn" onclick="alert('Demo: logout belum diimplementasikan di preview statis ini.')"><span class="ic" style="width:20px;height:20px;">↗</span><span class="label-l">Keluar</span></div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
-  <main class="main">
-    <div class="topbar">
-      <div class="sidebar-toggle neo-sm" id="sbToggle" style="padding:0;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
-      </div>
-      <div class="search-box neo-inset">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" placeholder="Cari transaksi, kategori, akun...">
-      </div>
-      <div style="flex:1;"></div>
-      <div class="icon-btn neo-sm neo-hover">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-        <span class="dot"></span>
-      </div>
-      <div class="icon-btn neo-sm neo-hover">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      </div>
-      <div class="avatar">GP</div>
-    </div>
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobile()"></div>
 
-    <div class="header-row">
-      <div>
-        <h1>Selamat datang kembali, Gia 👋</h1>
-        <p class="sub">Ini ringkasan kondisi keuangan Personal Workspace kamu hari ini.</p>
-      </div>
-      <div class="pill-row">
-        <div class="pill neo-sm neo-hover">📅 30 Agu 2026</div>
-        <div class="pill neo-sm neo-hover export">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>
-          Export CSV
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn lg-hide" style="display:none" onclick="toggleMobile()" id="mobileBtn">☰</button>
+      <button class="icon-btn" onclick="toggleSidebar()" title="Lipat atau buka sidebar" style="display:none" id="sbToggle">☰</button>
+      <nav class="breadcrumb" id="breadcrumb"></nav>
+      <div class="top-right">
+        <div class="bell">
+          <button class="icon-btn" title="Notifikasi">🔔</button>
+          <span class="badge">3</span>
         </div>
-        <div class="pill btn-primary" style="color:#fff;">+ Add Transaction</div>
+        <div class="avatar" style="width:40px;height:40px;">GP</div>
       </div>
-    </div>
+    </header>
 
-    <!-- KPI -->
-    <div class="kpi-grid">
-      <div class="neo kpi">
-        <div class="kpi-top">
-          <div class="kpi-label">Total Pemasukan</div>
-          <div class="kpi-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
-        </div>
-        <div class="kpi-value mono">Rp 20.320.000</div>
-        <div class="kpi-delta">▲ 12.4% dari bulan lalu</div>
-      </div>
-      <div class="neo kpi">
-        <div class="kpi-top">
-          <div class="kpi-label">Total Pengeluaran</div>
-          <div class="kpi-icon" style="color:var(--danger);background:#FEE2E2;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>
-        </div>
-        <div class="kpi-value mono">Rp 13.145.000</div>
-        <div class="kpi-delta down">▼ 4.1% dari bulan lalu</div>
-      </div>
-      <div class="neo kpi">
-        <div class="kpi-top">
-          <div class="kpi-label">Net Cash Flow</div>
-          <div class="kpi-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 12h18M14 6l6 6-6 6"/></svg></div>
-        </div>
-        <div class="kpi-value mono">Rp 7.175.000</div>
-        <div class="kpi-delta">Surplus · sehat</div>
-      </div>
-      <div class="neo kpi">
-        <div class="kpi-top">
-          <div class="kpi-label">Net Worth</div>
-          <div class="kpi-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2 2 7l10 5 10-5-10-5ZM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-        </div>
-        <div class="kpi-value mono">Rp 214.850.000</div>
-        <div class="kpi-delta">▲ Aset &gt; Kewajiban</div>
-      </div>
-    </div>
-
-    <!-- CHARTS -->
-    <div class="charts-row">
-      <div class="neo chart-card">
-        <div class="chart-head">
-          <div>
-            <div class="card-title">Tren Arus Kas</div>
-            <div class="card-sub">Total Net Cash Flow: <b class="mono" style="color:var(--text)">Rp 7.175.000</b></div>
-          </div>
-          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
-            <div style="display:flex;gap:14px;font-size:12.5px;color:var(--text-muted);">
-              <span><span class="legend-dot" style="background:var(--primary)"></span>Pemasukan</span>
-              <span><span class="legend-dot" style="background:#CDE3D2"></span>Pengeluaran</span>
-            </div>
-            <div class="tab-pill-group">
-              <div class="tab-pill">Mingguan</div>
-              <div class="tab-pill active">Bulanan</div>
-              <div class="tab-pill">Tahunan</div>
-            </div>
-          </div>
-        </div>
-        <div style="height:270px;margin-top:10px;">
-          <canvas id="cashflowChart"></canvas>
-        </div>
-      </div>
-
-      <div class="neo chart-card">
-        <div class="chart-head" style="margin-bottom:0;">
-          <div>
-            <div class="card-title">Pengeluaran per Kategori</div>
-            <div class="card-sub">1 – 30 Agustus</div>
-          </div>
-        </div>
-        <div style="height:190px;display:flex;align-items:center;justify-content:center;">
-          <canvas id="breakdownChart"></canvas>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;">
-          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span><span class="legend-dot" style="background:#16A34A"></span>Makan &amp; Harian</span><b class="mono">32%</b></div>
-          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span><span class="legend-dot" style="background:#4ADE80"></span>Cicilan</span><b class="mono">24%</b></div>
-          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span><span class="legend-dot" style="background:#A7F3D0"></span>Transportasi</span><b class="mono">18%</b></div>
-          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span><span class="legend-dot" style="background:#D97706"></span>Hiburan</span><b class="mono">14%</b></div>
-          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span><span class="legend-dot" style="background:#DC2626"></span>Lainnya</span><b class="mono">12%</b></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- LOWER: table + budget -->
-    <div class="lower-row">
-      <div class="neo table-card">
-        <div class="table-head">
-          <div class="card-title">Transaksi Terbaru</div>
-          <div class="search-box neo-inset" style="max-width:220px;padding:8px 12px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" placeholder="Cari transaksi" style="font-size:13px;">
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>Tanggal</th><th>Kategori</th><th>Akun</th><th>Status</th><th style="text-align:right;">Jumlah</th></tr></thead>
-          <tbody>
-            <tr>
-              <td>29 Agu 2026</td>
-              <td><span class="cat-badge">🍜 Makan &amp; Harian</span></td>
-              <td>Gopay</td>
-              <td><span class="status"><span class="dot2"></span>Tercatat</span></td>
-              <td style="text-align:right;" class="amt-out mono">- Rp 85.000</td>
-            </tr>
-            <tr>
-              <td>28 Agu 2026</td>
-              <td><span class="cat-badge">💼 Freelance</span></td>
-              <td>BCA</td>
-              <td><span class="status"><span class="dot2"></span>Tercatat</span></td>
-              <td style="text-align:right;" class="amt-in mono">+ Rp 3.500.000</td>
-            </tr>
-            <tr>
-              <td>27 Agu 2026</td>
-              <td><span class="cat-badge">🏠 Cicilan KPR</span></td>
-              <td>Mandiri</td>
-              <td><span class="status"><span class="dot2"></span>Tercatat</span></td>
-              <td style="text-align:right;" class="amt-out mono">- Rp 2.750.000</td>
-            </tr>
-            <tr>
-              <td>25 Agu 2026</td>
-              <td><span class="cat-badge">🎬 Hiburan</span></td>
-              <td>OVO</td>
-              <td><span class="status"><span class="dot2"></span>Tercatat</span></td>
-              <td style="text-align:right;" class="amt-out mono">- Rp 150.000</td>
-            </tr>
-            <tr>
-              <td>24 Agu 2026</td>
-              <td><span class="cat-badge">💰 Gaji</span></td>
-              <td>BCA</td>
-              <td><span class="status"><span class="dot2"></span>Tercatat</span></td>
-              <td style="text-align:right;" class="amt-in mono">+ Rp 16.820.000</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="neo budget-card">
-        <div class="card-title">Anggaran vs Realisasi</div>
-        <div class="budget-item">
-          <div class="budget-item-top"><span>Makan &amp; Harian</span><span class="muted mono">Rp 1.6jt / Rp 2.5jt</span></div>
-          <div class="track"><div class="fill green" style="width:64%"></div></div>
-        </div>
-        <div class="budget-item">
-          <div class="budget-item-top"><span>Transportasi</span><span class="muted mono">Rp 850rb / Rp 1jt</span></div>
-          <div class="track"><div class="fill yellow" style="width:85%"></div></div>
-        </div>
-        <div class="budget-item">
-          <div class="budget-item-top"><span>Hiburan</span><span class="muted mono">Rp 720rb / Rp 500rb</span></div>
-          <div class="track"><div class="fill red" style="width:100%"></div></div>
-        </div>
-        <div class="budget-item">
-          <div class="budget-item-top"><span>Belanja Rumah</span><span class="muted mono">Rp 480rb / Rp 1.2jt</span></div>
-          <div class="track"><div class="fill green" style="width:40%"></div></div>
-        </div>
-        <div class="neo-inset" style="padding:14px;margin-top:4px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-size:12px;color:var(--text-muted);font-weight:600;">Financial Health Score</div>
-            <div style="font-size:20px;font-weight:800;color:var(--primary-dark);">78 / 100 — Sehat</div>
-          </div>
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.2"><path d="M12 2a5 5 0 0 0-5 5c0 3 2 5 2 8h6c0-3 2-5 2-8a5 5 0 0 0-5-5Z"/><path d="M9 21h6M10 18h4"/></svg>
-        </div>
-      </div>
-    </div>
-
-  </main>
+    <main id="main"></main>
+  </div>
 </div>
 
 <script>
-  // Sidebar collapse
-  const sidebar = document.getElementById('sidebar');
-  document.getElementById('sbToggle').addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
+/* =====================================================================
+   Data contoh + router multi-halaman. Mirip navigasi app asli (berbasis
+   Livewire/Alpine), di sini disimulasikan dengan section yang di-switch.
+   ===================================================================== */
+
+const CONTENT = {};
+
+/* ---------- shared small helpers ---------- */
+function money(v){ return 'Rp '+v.toLocaleString('id-ID'); }
+function kpi(label, value, delta, sub, tone){ return `
+  <div class="neo-card neo-card--hover kpi">
+    <div class="label">${label}</div>
+    <div class="value">${value}</div>
+    ${delta ? `<div class="delta ${tone}">${delta}</div>` : ''}
+    ${sub ? `<div class="sub ${tone}">${sub}</div>` : ''}
+  </div>`;
+}
+
+/* ============ DASHBOARD ============ */
+CONTENT.dashboard = `
+  <div class="hdr">
+    <div>
+      <h1>Ringkasan Keuangan</h1>
+      <p class="sub">Personal Workspace · September 2026</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="neo-btn primary sm" onclick="go('transactions')">+ Tambah Transaksi</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    ${kpi('Total Pemasukan','Rp 20.320.000','▲ 12.4% dari bulan lalu','Bulan ini','t-positive')}
+    ${kpi('Total Pengeluaran','Rp 13.145.000','▼ 4.1% dari bulan lalu','Bulan ini','t-muted')}
+    ${kpi('Net Cash Flow','Rp 7.175.000','Surplus bulan ini','Bulan ini','t-positive')}
+    ${kpi('Net Worth','Rp 214.850.000','Aset − Kewajiban','Dari saldo akun aktif','t-info')}
+  </div>
+  <div class="kpi-grid cols-2">
+    ${kpi('Saldo Aktif','Rp 86.450.000','Kas likuid','Tunai · Bank · E-Wallet','t-info')}
+    ${kpi('Tabungan','Rp 28.300.000','Akun Tabungan','Ditampilkan terpisah dari saldo aktif','t-positive')}
+  </div>
+
+  <div class="card neo-card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Laporan Arus Kas &amp; Pengeluaran</div>
+        <div class="card-sub">Sep 2025 – Sep 2026 · Bulanan</div>
+      </div>
+      <div class="controls">
+        <select class="field sel" style="width:auto;padding:11px 14px;" id="granularity" onchange="changeGranularity(this.value)">
+          <option value="month" selected>Bulanan</option>
+          <option value="day">Harian</option>
+          <option value="year">Tahunan</option>
+          <option value="custom">Kustom</option>
+        </select>
+        <button class="icon-btn" title="Periode sebelumnya">‹</button>
+        <button class="icon-btn" title="Periode berikutnya">›</button>
+      </div>
+    </div>
+
+    <div class="summary-grid" style="margin-bottom:24px;">
+      <div class="summary-box neo-inset"><div class="t">Pemasukan</div><div class="v">Rp 20.320.000</div><div class="d t-positive">▲ 12.4% dibanding periode sebelumnya</div></div>
+      <div class="summary-box neo-inset"><div class="t">Pengeluaran</div><div class="v">Rp 13.145.000</div><div class="d t-muted">▼ 4.1% dibanding periode sebelumnya</div></div>
+      <div class="summary-box neo-inset"><div class="t">Net Cash Flow</div><div class="v t-positive">Rp 7.175.000</div><div class="d t-muted">Surplus</div></div>
+      <div class="summary-box neo-inset"><div class="t">Rasio</div><div class="v">154.6%</div><div class="d t-muted">Daya tampung pengeluaran</div></div>
+    </div>
+
+    <div class="chart-grid">
+      <div>
+        <div class="card-head" style="margin-bottom:8px;">
+          <h3 class="card-title">Tren Arus Kas</h3>
+          <div class="controls" style="gap:14px;font-size:12.5px;">
+            <span><span class="legend-dot" style="background:var(--primary)"></span> Pemasukan</span>
+            <span><span class="legend-dot" style="background:var(--primary-soft)"></span> Pengeluaran</span>
+          </div>
+        </div>
+        <div style="height:280px;"><canvas id="trendChart"></canvas></div>
+      </div>
+      <div>
+        <div class="card-head" style="margin-bottom:10px;">
+          <h3 class="card-title">Pengeluaran per Kategori</h3>
+          <span style="font-size:12.5px;color:var(--text-muted);">Periode aktif</span>
+        </div>
+        <div class="dough-wrap"><canvas id="doughnutChart"></canvas></div>
+        <ul style="list-style:none;margin:16px 0 0;padding:0;" class="cat-breakdown">
+          <li style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;"><span class="legend-dot" style="background:#16A34A"></span><span style="flex:1">Makan &amp; Harian</span><b>Rp 4.206.400</b><span class="t-muted" style="width:44px;text-align:right;font-size:12px;">32%</span></li>
+          <li style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;"><span class="legend-dot" style="background:#4ADE80"></span><span style="flex:1">Cicilan</span><b>Rp 3.154.800</b><span class="t-muted" style="width:44px;text-align:right;font-size:12px;">24%</span></li>
+          <li style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;"><span class="legend-dot" style="background:#A7F3D0"></span><span style="flex:1">Transportasi</span><b>Rp 2.366.100</b><span class="t-muted" style="width:44px;text-align:right;font-size:12px;">18%</span></li>
+          <li style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;"><span class="legend-dot" style="background:#D97706"></span><span style="flex:1">Hiburan</span><b>Rp 1.840.300</b><span class="t-muted" style="width:44px;text-align:right;font-size:12px;">14%</span></li>
+          <li style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px;"><span class="legend-dot" style="background:#DC2626"></span><span style="flex:1">Lainnya</span><b>Rp 1.577.400</b><span class="t-muted" style="width:44px;text-align:right;font-size:12px;">12%</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card neo-card" style="padding:0;">
+    <div class="card-head" style="margin:0;padding:16px 24px;border-bottom:1px solid rgba(198,214,203,.4);">
+      <h3 class="card-title">Skor Kesehatan Keuangan</h3>
+      <span class="card-sub" style="margin:0;">Berdasarkan rasio tabungan, utang, dan dana darurat bulan ini</span>
+    </div>
+    <div class="grid-3 grid-mid" style="gap:20px;padding:24px;align-items:stretch;">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+        <div class="ring" style="--pct:78"><div class="ring-inner"><div style="font-size:36px;font-weight:700;">78</div><div style="font-size:12px;color:var(--text-muted);">dari 100</div></div></div>
+        <p style="margin:0;font-size:14px;font-weight:600;">Cukup Baik</p>
+      </div>
+      <div class="stack" style="grid-column:span 2;">
+        <div class="ratio-row neo-inset">
+          <div class="ic-box neo-inset-sm">🧮</div>
+          <div class="label-l" style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">Rasio Tabungan</b><span class="badge badge-green">Sehat</span></div>
+            <div class="card-sub" style="margin-top:4px;">Tabungan Anda 24.8% dari pemasukan — di atas ideal 20%. Pertahankan kebiasaan menabung ini.</div>
+          </div>
+          <div style="text-align:right;"><div style="font-size:20px;font-weight:700;">24.8<span class="t-muted" style="font-size:14px;font-weight:500;">%</span></div><div style="font-size:11px;color:var(--text-muted);">Ideal ≥ 20%</div></div>
+        </div>
+        <div class="ratio-row neo-inset">
+          <div class="ic-box neo-inset-sm">💳</div>
+          <div class="label-l" style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">Rasio Utang (DTI)</b><span class="badge badge-green">Sehat</span></div>
+            <div class="card-sub" style="margin-top:4px;">Rasio utang Anda 20.1% — di bawah batas ideal 30%. Beban cicilan masih aman.</div>
+          </div>
+          <div style="text-align:right;"><div style="font-size:20px;font-weight:700;">20.1<span class="t-muted" style="font-size:14px;font-weight:500;">%</span></div><div style="font-size:11px;color:var(--text-muted);">Ideal ≤ 30%</div></div>
+        </div>
+        <div class="ratio-row neo-inset">
+          <div class="ic-box neo-inset-sm">🛡</div>
+          <div class="label-l" style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">Dana Darurat</b><span class="badge badge-yellow">Waspada</span></div>
+            <div class="card-sub" style="margin-top:4px;">Dana darurat Anda hanya menutupi 2.8 bulan pengeluaran. Targetkan 3–6 bulan agar lebih aman.</div>
+          </div>
+          <div style="text-align:right;"><div style="font-size:20px;font-weight:700;">2.8<span class="t-muted" style="font-size:14px;font-weight:500;"> bln</span></div><div style="font-size:11px;color:var(--text-muted);">Ideal 3–6 bulan</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card neo-card" style="padding:0;">
+    <div class="row-head">
+      <h3 class="card-title">Transaksi Terbaru</h3>
+      <button class="neo-btn sm" onclick="go('transactions')">Lihat Semua</button>
+    </div>
+    <div class="list">
+      <div class="row"><div class="ic-box neo-inset-sm">🍜</div><div class="label-l" style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Makan siang</div><div class="card-sub" style="margin:0;">06 Sep 2026 · Gopay</div></div><b class="t-neg">-Rp 85.000</b></div>
+      <div class="row"><div class="ic-box neo-inset-sm">💼</div><div class="label-l" style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Freelance</div><div class="card-sub" style="margin:0;">05 Sep 2026 · BCA</div></div><b class="t-positive">+Rp 3.500.000</b></div>
+      <div class="row"><div class="ic-box neo-inset-sm">🏠</div><div class="label-l" style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Cicilan KPR</div><div class="card-sub" style="margin:0;">03 Sep 2026 · Mandiri</div></div><b class="t-neg">-Rp 2.750.000</b></div>
+      <div class="row"><div class="ic-box neo-inset-sm">🎬</div><div class="label-l" style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Netflix</div><div class="card-sub" style="margin:0;">01 Sep 2026 · OVO</div></div><b class="t-neg">-Rp 150.000</b></div>
+      <div class="row"><div class="ic-box neo-inset-sm">💰</div><div class="label-l" style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Gaji</div><div class="card-sub" style="margin:0;">28 Agu 2026 · BCA</div></div><b class="t-positive">+Rp 16.820.000</b></div>
+    </div>
+  </div>
+`;
+
+/* ============ TRANSACTIONS ============ */
+CONTENT.transactions = `
+  <div class="hdr">
+    <div>
+      <h1>Transaksi</h1>
+      <p class="sub">Catat pemasukan, pengeluaran, dan transfer antar akun.</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="neo-btn sm">⇩ Export CSV</button>
+      <button class="neo-btn primary sm">+ Tambah Transaksi</button>
+    </div>
+  </div>
+
+  <div class="account-cards">
+    <div class="neo-card neo-card--hover"><div style="display:flex;align-items:center;gap:12px;"><div class="ic-box neo-inset-sm">🏦</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">BCA</div><div style="font-size:12px;color:var(--text-muted);">Bank</div></div></div><div style="margin-top:12px;font-size:14px;font-weight:700;">Rp 28.750.000</div></div>
+    <div class="neo-card neo-card--hover"><div style="display:flex;align-items:center;gap:12px;"><div class="ic-box neo-inset-sm">💳</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Mandiri</div><div style="font-size:12px;color:var(--text-muted);">Kartu Kredit</div></div></div><div style="margin-top:12px;font-size:14px;font-weight:700;color:var(--danger);">-Rp 6.200.000</div></div>
+    <div class="neo-card neo-card--hover"><div style="display:flex;align-items:center;gap:12px;"><div class="ic-box neo-inset-sm">📱</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Gopay</div><div style="font-size:12px;color:var(--text-muted);">E-Wallet</div></div></div><div style="margin-top:12px;font-size:14px;font-weight:700;">Rp 2.350.000</div></div>
+    <div class="neo-card neo-card--hover"><div style="display:flex;align-items:center;gap:12px;"><div class="ic-box neo-inset-sm">🏦</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Tabungan Mandiri</div><div style="font-size:12px;color:var(--text-muted);">Tabungan</div></div></div><div style="margin-top:12px;font-size:14px;font-weight:700;">Rp 28.300.000</div></div>
+  </div>
+
+  <div class="card neo-card" style="padding:0;">
+    <div class="filter-row row-head" style="gap:10px;align-items:center;">
+      <div class="field search-field" style="position:relative;flex:1 1 220px;min-width:200px;display:flex;align-items:center;gap:8px;padding:10px 14px;">
+        <span style="color:var(--text-muted);">⌕</span>
+        <input type="search" placeholder="Cari catatan, akun, kategori, tag..." style="border:none;background:transparent;outline:none;width:100%;font-size:14px;color:var(--text);">
+      </div>
+      <div class="filter-controls" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <select class="field sel"><option>Semua Akun</option><option>BCA</option><option>Gopay</option></select>
+        <select class="field sel"><option>Semua Kategori</option></select>
+        <select class="field sel"><option>Semua Tag</option></select>
+        <input type="date" class="field sel" title="Dari tanggal">
+        <input type="date" class="field sel" title="Sampai tanggal">
+      </div>
+    </div>
+
+    <div class="list">
+      <div class="row">
+        <div class="ic-box neo-inset-sm">💰</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Gaji</div><div style="font-size:12px;color:var(--text-muted);">28 Agu 2026 · bonus bulanan</div><div style="margin-top:4px;display:flex;gap:4px;"><span class="tag-pill" style="color:#EAB308;background:rgba(234,179,8,.12)">#rutin</span></div></div>
+        <b class="t-positive">+Rp 16.820.000</b>
+        <div style="display:flex;gap:8px;"><button class="icon-btn sm" title="Ubah transaksi" style="width:36px;height:36px;">✎</button><button class="icon-btn sm" title="Hapus transaksi" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+      <div class="row">
+        <div class="ic-box neo-inset-sm">🍜</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Makan &amp; Harian</div><div style="font-size:12px;color:var(--text-muted);">27 Agu 2026 · Belanja mingguan</div><div style="margin-top:4px;display:flex;gap:4px;"><span class="tag-pill" style="color:#D97706;background:rgba(217,119,6,.12)">#penting</span></div></div>
+        <b class="t-neg">-Rp 450.000</b>
+        <div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">✎</button><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+      <div class="row">
+        <div class="ic-box neo-inset-sm">🏠</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Cicilan KPR <span class="badge badge-yellow" style="margin-left:4px;">UTANG</span></div><div style="font-size:12px;color:var(--text-muted);">27 Agu 2026 · Pembayaran cicilan</div></div>
+        <b class="t-neg">-Rp 2.750.000</b>
+        <div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">✎</button><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+      <div class="row">
+        <div class="ic-box neo-inset-sm">⇄</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">BCA → Gopay</div><div style="font-size:12px;color:var(--text-muted);">25 Agu 2026 · Top up e-wallet</div></div>
+        <b>Rp 500.000</b>
+        <div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">✎</button><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+      <div class="row">
+        <div class="ic-box neo-inset-sm">🎬</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Hiburan</div><div style="font-size:12px;color:var(--text-muted);">24 Agu 2026 · Langganan Netflix</div></div>
+        <b class="t-neg">-Rp 150.000</b>
+        <div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">✎</button><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+    </div>
+    <div class="row-head" style="border-top:1px solid rgba(198,214,203,.4);">
+      <span style="font-size:13px;color:var(--text-muted);">Menampilkan 5 dari 47 transaksi</span>
+      <div class="controls">
+        <button class="icon-btn sm" disabled style="opacity:.4;width:36px;height:36px;">‹</button>
+        <span class="badge badge-green">1</span>
+        <span class="badge badge-muted">2</span>
+        <span class="badge badge-muted">3</span>
+        <button class="icon-btn sm" style="width:36px;height:36px;">›</button>
+      </div>
+    </div>
+  </div>
+`;
+
+/* ============ ACCOUNTS ============ */
+function accountGroup(type, count, accounts){ return `
+  <div class="card neo-card" style="padding:0;">
+    <div class="row-head" style="padding:16px 24px;">
+      <div style="display:flex;align-items:center;gap:8px;"><h3 class="card-title" style="margin:0;">${type}</h3><span class="badge badge-muted">${count}</span></div>
+    </div>
+    <div class="list">${accounts}</div>
+  </div>`;
+}
+function accountRow(logo, logoBox, name, subtitle, balance, extra){ return `
+  <div class="row">
+    <div class="ic-box neo-inset-sm" style="font-size:20px;">${logo}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">${name}</b>${extra||''}</div>
+      <div style="font-size:12px;color:var(--text-muted);">${subtitle}</div>
+    </div>
+    <b style="font-size:14px;">${balance}</b>
+    <div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:40px;height:40px;" title="Edit akun">✎</button><button class="icon-btn sm" style="width:40px;height:40px;">📁</button></div>
+  </div>`;
+}
+
+CONTENT.accounts = `
+  <div class="hdr">
+    <div>
+      <h1>Akun &amp; Dompet</h1>
+      <p class="sub">Kelola tunai, rekening bank, e-wallet, dan kartu kredit.</p>
+    </div>
+    <div class="hdr-actions"><button class="neo-btn primary sm">+ Tambah Akun</button></div>
+  </div>
+  <div class="kpi-grid">
+    ${kpi('Total Saldo Aktif','Rp 86.450.000','','','')}
+    ${kpi('Total Tabungan','Rp 28.300.000','','','')}
+    ${kpi('Total Utang Kartu Kredit','Rp 6.200.000','','','')}
+    ${kpi('Jumlah Akun','6','','','')}
+  </div>
+  ${accountGroup('Tunai',1, accountRow('💵','','Kas Tunai','24 transaksi','Rp 2.100.000'))}
+  ${accountGroup('Bank',2, accountRow('🏦','','BCA','36 transaksi','Rp 28.750.000') + accountRow('🏦','','Mandiri','41 transaksi','Rp 12.300.000'))}
+  ${accountGroup('E-Wallet',2, accountRow('📱','','Gopay','18 transaksi','Rp 2.350.000') + accountRow('📱','','OVO','12 transaksi','Rp 780.000'))}
+  ${accountGroup('Tabungan',1, accountRow('🏦','','Tabungan Mandiri','5 transaksi','Rp 28.300.000'))}
+  ${accountGroup('Kartu Kredit',1, accountRow('💳','','Kartu Mandiri CC','Limit Rp 15.000.000 · Terpakai 41% · Jatuh tempo tgl 15','-Rp 6.200.000'))}
+`;
+
+/* ============ RECURRING ============ */
+CONTENT.recurring = `
+  <div class="hdr">
+    <div>
+      <h1>Transaksi Berulang</h1>
+      <p class="sub">Aturan untuk mencatat transaksi rutin secara otomatis (gaji, tagihan, iuran).</p>
+    </div>
+    <div class="hdr-actions"><button class="neo-btn primary sm">+ Tambah Aturan</button></div>
+  </div>
+  <div class="card neo-card" style="padding:0;">
+    <div class="list">
+      <div class="row"><div class="ic-box neo-inset-sm">💰</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Pemasukan · Gaji</div><div style="font-size:12px;color:var(--text-muted);">Rp 16.820.000 · Bulanan · setiap 1 bulan · dari BCA</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Berikutnya: 28 Sep 2026</div></div><b>+Rp 16.820.000</b><div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div></div>
+      <div class="row"><div class="ic-box neo-inset-sm">🏠</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Pengeluaran · Cicilan KPR</div><div style="font-size:12px;color:var(--text-muted);">Rp 2.750.000 · Bulanan · setiap 1 bulan · dari Mandiri</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Berikutnya: 27 Sep 2026</div></div><b class="t-neg">-Rp 2.750.000</b><div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div></div>
+      <div class="row"><div class="ic-box neo-inset-sm">🎬</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Pengeluaran · Hiburan <span class="badge badge-red" style="margin-left:4px;">Nonaktif</span></div><div style="font-size:12px;color:var(--text-muted);"><s>Rp 150.000</s> · Bulanan · setiap 1 bulan · dari OVO</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Berikutnya: 24 Sep 2026</div></div><b class="t-neg"><s>Rp 150.000</s></b><div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div></div>
+      <div class="row"><div class="ic-box neo-inset-sm">⇄</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Transfer dari BCA ke Gopay</div><div style="font-size:12px;color:var(--text-muted);">Rp 500.000 · Bulanan · setiap 1 bulan · dari BCA</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Berikutnya: 25 Sep 2026</div></div><b>Rp 500.000</b><div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div></div>
+    </div>
+  </div>
+`;
+
+/* ============ BUDGETS ============ */
+function budgetRow(icon, name, actual, limit, pct, statusCls, statusLbl){ return `
+  <div class="budget-row" style="padding:16px 24px;border-bottom:1px solid rgba(198,214,203,.2);">
+    <div class="ic-box neo-inset-sm">${icon}</div>
+    <div class="b-main">
+      <div style="font-size:14px;font-weight:600;">${name}</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${actual} / ${limit}</div>
+      <div class="track" style="margin-top:8px;"><div class="fill ${statusCls}" style="width:${pct}%"></div></div>
+    </div>
+    <span class="b-status badge ${statusCls==='green'?'badge-green':statusCls==='yellow'?'badge-yellow':'badge-red'}">${statusLbl} · ${pct}%</span>
+    <div class="budget-inputs" style="grid-column:4 / -1;">
+      <div><label class="field-lbl">Limit</label><input type="number" class="field" value="${limit.replace(/[^0-9]/g,'')}"></div>
+      <div><label class="field-lbl">Alert &gt;=</label><div class="field" style="display:flex;align-items:center;gap:4px;"><input type="number" style="box-shadow:none;padding:0;width:100%;" value="80">%</div></div>
+    </div>
+  </div>`;
+}
+CONTENT.budgets = `
+  <div class="hdr">
+    <div>
+      <h1>Anggaran</h1>
+      <p class="sub">Tetapkan limit pengeluaran per kategori dan pantau realisasinya.</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="neo-btn sm">Salin dari bulan lalu</button>
+      <button class="icon-btn">‹</button>
+      <span class="badge badge-muted" style="font-size:14px;padding:10px 16px;">September 2026</span>
+      <button class="icon-btn">›</button>
+    </div>
+  </div>
+
+  <div class="alert alert-warn">
+    <b style="display:block;">Peringatan Anggaran</b>
+    <ul style="margin:6px 0 0;padding-left:18px;font-size:13.5px;">
+      <li>Hiburan telah melebihi/mendekati batas anggaran: Rp 720.000 dari Rp 500.000 (144%).</li>
+      <li>Transportasi telah melebihi/mendekati batas anggaran: Rp 850.000 dari Rp 1.000.000 (85%).</li>
+    </ul>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-box neo-inset"><div class="t">Total Limit</div><div class="v">Rp 5.200.000</div></div>
+    <div class="summary-box neo-inset"><div class="t">Total Realisasi</div><div class="v">Rp 4.286.400</div></div>
+    <div class="summary-box neo-inset"><div class="t">Pemakaian</div><div class="v">82.4%</div></div>
+    <div class="summary-box neo-inset" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div><div class="t">Legenda</div><div style="margin-top:6px;display:flex;gap:10px;font-size:12px;color:var(--text-muted);"><span><span class="legend-dot" style="background:var(--primary)"></span>&lt; 70%</span><span><span class="legend-dot" style="background:var(--warning)"></span>70–99%</span><span><span class="legend-dot" style="background:var(--danger)"></span>≥ 100%</span></div></div>
+    </div>
+  </div>
+
+  <div class="card neo-card" style="padding:0;">
+    <div class="row-head"><h3 class="card-title">Anggaran per Kategori</h3><span class="card-sub">Atur limit &amp; pantau realisasi pengeluaran bulan ini.</span></div>
+    <div class="list">
+      ${budgetRow('🍜','Makan &amp; Harian','Rp 1.600.000','Rp 2.500.000',64,'green','Aman')}
+      ${budgetRow('🚌','Transportasi','Rp 850.000','Rp 1.000.000',85,'yellow','Waspada')}
+      ${budgetRow('🎬','Hiburan','Rp 720.000','Rp 500.000',144,'red','Overbudget')}
+      ${budgetRow('🏠','Belanja Rumah','Rp 480.000','Rp 1.200.000',40,'green','Aman')}
+    </div>
+    <div class="row-head" style="border-top:1px solid rgba(198,214,203,.4);justify-content:flex-end;">
+      <button class="neo-btn primary sm">Simpan Anggaran</button>
+    </div>
+  </div>
+`;
+
+/* ============ NET WORTH ============ */
+CONTENT.networth = `
+  <div class="hdr">
+    <div>
+      <h1>Net Worth</h1>
+      <p class="sub">Pantau total aset dan kewajiban Anda beserta trennya.</p>
+    </div>
+  </div>
+  <div class="kpi-grid cols-3">
+    ${kpi('Total Aset','Rp 265.850.000','Nilai aset','Aset manual + saldo akun likuid','t-positive')}
+    ${kpi('Total Kewajiban','Rp 51.000.000','Utang tertagih','Liability + saldo kartu kredit','t-neg')}
+    ${kpi('Net Worth','Rp 214.850.000','Aset - Kewajiban','Positif','t-info')}
+  </div>
+  <div class="card neo-card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Tren Net Worth</div>
+        <div class="card-sub">Berdasarkan snapshot akhir bulan</div>
+      </div>
+    </div>
+    <div style="height:280px;"><canvas id="networthChart"></canvas></div>
+  </div>
+  <div class="grid-2">
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Aset</h3><span class="badge badge-muted">3 item</span></div>
+      <div class="list">
+        <div class="row"><div class="ic-box neo-inset-sm">🏠</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Rumah</div><div style="font-size:12px;color:var(--text-muted);">Properti</div></div><b>Rp 180.000.000</b><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+        <div class="row"><div class="ic-box neo-inset-sm">🚗</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Mobil</div><div style="font-size:12px;color:var(--text-muted);">Kendaraan</div></div><b>Rp 75.000.000</b><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+      <div class="row-head" style="border-top:1px solid rgba(198,214,203,.2);"><button class="neo-btn sm">+ Tambah Aset</button></div>
+    </div>
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Kewajiban</h3><span class="badge badge-muted">2 item</span></div>
+      <div class="list">
+        <div class="row"><div class="ic-box neo-inset-sm">🏠</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">KPR Rumah</div><div style="font-size:12px;color:var(--text-muted);">Cicilan Rp 2.750.000/bln</div></div><b class="t-neg">Rp 44.800.000</b><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+        <div class="row"><div class="ic-box neo-inset-sm">💳</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Kartu Kredit</div><div style="font-size:12px;color:var(--text-muted);">Cicilan Rp 650.000/bln</div></div><b class="t-neg">Rp 6.200.000</b><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+      <div class="row-head" style="border-top:1px solid rgba(198,214,203,.2);"><button class="neo-btn sm">+ Tambah Kewajiban</button></div>
+    </div>
+  </div>
+`;
+
+/* ============ REPORTS ============ */
+CONTENT.reports = `
+  <div class="hdr">
+    <div>
+      <h1>Reports</h1>
+      <p class="sub">Ringkasan arus kas dan rincian pengeluaran berdasarkan bulan.</p>
+    </div>
+    <div class="hdr-actions">
+      <input type="month" class="field sel" style="width:auto;" value="2026-09">
+      <button class="neo-btn primary sm">Tampilkan</button>
+    </div>
+  </div>
+  <div class="kpi-grid cols-3">
+    ${kpi('Pemasukan','Rp 20.320.000','Tipe income bulan ini','Surplus','t-positive','')}
+    ${kpi('Pengeluaran','Rp 13.145.000','Tipe expense bulan ini','Defisit','t-neg','')}
+    ${kpi('Net Cash Flow','Rp 7.175.000','Surplus','','t-positive','')}
+  </div>
+  <div class="chart-grid">
+    <div class="card neo-card">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Tren Arus Kas Harian</div>
+          <div class="card-sub">1 – 30 September 2026</div>
+        </div>
+        <div class="controls" style="gap:14px;font-size:12.5px;">
+          <span><span class="legend-dot" style="background:var(--primary)"></span> Pemasukan</span>
+          <span><span class="legend-dot" style="background:var(--danger)"></span> Pengeluaran</span>
+        </div>
+      </div>
+      <div style="height:280px;"><canvas id="reportsLineChart"></canvas></div>
+    </div>
+    <div class="card neo-card">
+      <div class="card-title">Pengeluaran per Kategori</div>
+      <ul style="list-style:none;margin:16px 0 0;padding:0;" class="stack">
+        ${catBar('🍜','Makan &amp; Harian','Rp 4.206.400',32,'#16A34A')}
+        ${catBar('🏠','Cicilan','Rp 3.154.800',24,'#4ADE80')}
+        ${catBar('🚌','Transportasi','Rp 2.366.100',18,'#A7F3D0')}
+        ${catBar('🎬','Hiburan','Rp 1.840.300',14,'#D97706')}
+        ${catBar('📦','Lainnya','Rp 1.577.400',12,'#DC2626')}
+      </ul>
+    </div>
+  </div>
+`;
+function catBar(icon, name, amount, pct, color){ return `
+  <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+    <span>${icon}</span>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;justify-content:space-between;"><span>${name}</span><b>${amount}</b><span class="t-muted" style="font-size:12px;">${pct}%</span></div>
+      <div class="track" style="margin-top:6px;"><div class="fill green" style="width:${pct}%;background:${color}"></div></div>
+    </div>
+  </li>`;
+}
+
+/* ============ DEBTS ============ */
+function debtCard(name, badges, meta, principal, paid, remaining, remColor, pct){ return `
+  <div class="card neo-card" style="padding:0;">
+    <div class="row-head">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:15px;">${name}</b>${badges}</div>
+    </div>
+    <div style="padding:0 24px 8px;">
+      <div style="font-size:12px;color:var(--text-muted);">${meta}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:14px;">
+        <span>Pokok <b>${principal}</b></span>
+        <span>·</span>
+        <span>Terbayar <b>${paid}</b></span>
+        <span>·</span>
+        <span>Sisa <b class="${remColor}">${remaining}</b></span>
+      </div>
+      <div class="track" style="margin-top:12px;"><div class="fill green" style="width:${pct}%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">${pct}% terbayar</div>
+    </div>
+    <div class="stack">
+      <details class="budget-details"><summary>Jadwal cicilan (3/5 lunas)</summary>
+        <table class="stat-tbl">
+          <thead><tr><th>Cicilan</th><th>Jatuh Tempo</th><th class="r">Nominal</th><th class="r">Terbayar</th><th class="r">Status</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>10 Mei 2026</td><td class="r">Rp 950.000</td><td class="r">Rp 950.000</td><td class="r t-positive">Lunas</td></tr>
+            <tr><td>2</td><td>10 Jun 2026</td><td class="r">Rp 950.000</td><td class="r">Rp 950.000</td><td class="r t-positive">Lunas</td></tr>
+            <tr><td>3</td><td>10 Jul 2026</td><td class="r">Rp 950.000</td><td class="r">Rp 950.000</td><td class="r t-positive">Lunas</td></tr>
+            <tr><td>4</td><td>10 Agu 2026</td><td class="r">Rp 950.000</td><td class="r">Rp 600.000</td><td class="r t-muted">Sebagian</td></tr>
+            <tr><td>5</td><td>10 Sep 2026</td><td class="r">Rp 950.000</td><td class="r">Rp 0</td><td class="r t-muted">Belum</td></tr>
+          </tbody>
+        </table>
+      </details>
+      <details class="budget-details"><summary>Riwayat pembayaran (4)</summary>
+        <div class="stack" style="padding:0 24px 12px;">
+          <div class="row" style="padding:10px 0;"><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">10 Agu 2026 · BCA</div><div class="card-sub" style="margin:0;">Transfer otomatis</div></div><b>Rp 600.000</b><button class="icon-btn sm" style="width:32px;height:32px;">🗑</button></div>
+          <div class="row" style="padding:10px 0;"><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">10 Jul 2026 · BCA</div><div class="card-sub" style="margin:0;">Transfer otomatis</div></div><b>Rp 950.000</b><button class="icon-btn sm" style="width:32px;height:32px;">🗑</button></div>
+        </div>
+      </details>
+      <details class="budget-details"><summary>Catat pembayaran</summary>
+        <div class="grid-3" style="padding:0 24px 16px;">
+          <div><label class="field-lbl">Akun</label><select class="field"><option>BCA</option><option>Gopay</option></select></div>
+          <div><label class="field-lbl">Jumlah</label><input type="number" class="field" placeholder="cth. 950000"></div>
+          <div><label class="field-lbl">Tanggal</label><input type="date" class="field" value="2026-09-10"></div>
+        </div>
+        <div style="padding:0 24px 16px;"><button class="neo-btn primary sm">Simpan Bayaran</button></div>
+      </details>
+      <details class="budget-details"><summary>Ubah data</summary>
+        <div class="grid-3" style="padding:0 24px 16px;">
+          <div><label class="field-lbl">Nama / Lawan Transaksi</label><input type="text" class="field" value="Budi"></div>
+          <div><label class="field-lbl">Jumlah Pokok</label><input type="number" class="field" value="4750000"></div>
+          <div><label class="field-lbl">Akun</label><select class="field"><option>BCA</option></select></div>
+        </div>
+        <div style="padding:0 24px 16px;"><button class="neo-btn primary sm">Perbarui</button></div>
+      </details>
+    </div>
+  </div>`;
+}
+CONTENT.debts = `
+  <div class="hdr">
+    <div>
+      <h1>Debt Tracker</h1>
+      <p class="sub">Pantau utang yang harus dibayar dan piutang yang perlu ditagih. Setiap pembayaran otomatis dicatat ke transaksi.</p>
+    </div>
+  </div>
+  <div class="kpi-grid cols-2">
+    ${kpi('Total Utang Belum Dibayar','Rp 4.750.000','Payable','Yang harus Anda bayar','t-neg')}
+    ${kpi('Total Piutang Belum Tertagih','Rp 2.300.000','Receivable','Yang harus dibayar ke Anda','t-positive')}
+  </div>
+  <div class="card neo-card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Tambah Utang / Piutang</div>
+        <div class="card-sub">Sisa terhutang dihitung otomatis dari pokok dikurangi total pembayaran.</div>
+      </div>
+    </div>
+    <div class="grid-2" style="row-gap:16px;column-gap:16px;align-items:end;">
+      <div><label class="field-lbl">Arah</label><select class="field"><option>Utang (saya bayar)</option><option>Piutang (dibayar ke saya)</option></select></div>
+      <div><label class="field-lbl">Nama / Lawan Transaksi</label><input type="text" class="field" placeholder="cth. Budi, Bank XYZ"></div>
+      <div><label class="field-lbl">Jumlah Pokok</label><input type="number" class="field" placeholder="0"></div>
+      <div><label class="field-lbl">Akun Bayar/Terima</label><select class="field"><option>— Pilih akun —</option></select></div>
+      <div><label class="field-lbl">Tenor (jumlah bulan)</label><input type="number" class="field" placeholder="cth. 12"></div>
+      <div><label class="field-lbl">Cicilan pertama jatuh tempo</label><input type="date" class="field"></div>
+      <div><label class="field-lbl">Jatuh Tempo (opsional)</label><input type="date" class="field"></div>
+      <div><label class="field-lbl">Catatan (opsional)</label><input type="text" class="field" placeholder="Opsional"></div>
+    </div>
+    <div style="margin-top:16px;"><button class="neo-btn primary">+ Tambah</button></div>
+  </div>
+  <div class="grid-2">
+    <div class="stack">
+      <div class="sec-head"><h3 class="card-title" style="margin:0;">Utang</h3></div>
+      ${debtCard('Budi','<span class="badge badge-red">Terlambat</span>','Utang (saya bayar) · Jatuh tempo 10 Sep 2026 · Tenor 5 bulan','Rp 4.750.000','Rp 3.450.000','<span class="t-neg">Rp 1.300.000</span>','','73')}
+    </div>
+    <div class="stack">
+      <div class="sec-head"><h3 class="card-title" style="margin:0;">Piutang</h3></div>
+      ${debtCard('Andi','<span class="badge badge-yellow">Sebagian</span>','Piutang (dibayar ke saya) · Jatuh tempo 20 Sep 2026 · Tenor 3 bulan','Rp 3.000.000','Rp 700.000','<span class="t-positive">Rp 2.300.000</span>','t-positive','23')}
+    </div>
+  </div>
+`;
+
+/* ============ CATEGORIES & TAGS ============ */
+function catTree(icon, name, badges, sub){ return `
+  <div class="row">
+    <div class="ic-box neo-inset-sm">${icon}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">${name}</b>${badges}</div>
+    </div>
+    <span class="t-muted" style="font-size:12px;">${sub}</span>
+    <div style="display:flex;gap:8px;"><button class="icon-btn sm" style="width:36px;height:36px;">✎</button><button class="icon-btn sm" style="width:36px;height:36px;">📁</button><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+  </div>`;
+}
+CONTENT.categories = `
+  <div class="hdr">
+    <div>
+      <h1>Kategori</h1>
+      <p class="sub">Kelola kategori pemasukan &amp; pengeluaran, serta tag.</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="neo-btn sm">Hide All</button>
+      <button class="neo-btn sm">Show All</button>
+      <button class="neo-btn primary sm">+ Tambah Kategori</button>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Pemasukan</h3><span class="badge badge-muted">3</span></div>
+      <div class="list">
+        ${catTree('💰','Gaji','<span class="badge badge-green">Bawaan</span>','0 sub-kategori')}
+        ${catTree('💼','Freelance','','2 sub-kategori')}
+        ${catTree('📈','Investasi','','1 sub-kategori')}
+      </div>
+    </div>
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Pengeluaran</h3><span class="badge badge-muted">6</span></div>
+      <div class="list">
+        ${catTree('🍜','Makan &amp; Harian','<span class="badge badge-green">Bawaan</span>','3 sub-kategori')}
+        ${catTree('🏠','Cicilan','','2 sub-kategori')}
+        ${catTree('🚌','Transportasi','','2 sub-kategori')}
+        ${catTree('🎬','Hiburan','','0 sub-kategori')}
+        ${catTree('📦','Belanja','<span class="badge badge-red">Arsip</span>','1 sub-kategori')}
+      </div>
+    </div>
+  </div>
+  <div class="grid-13">
+    <div class="card neo-card">
+      <div class="card-title">Tambah Tag</div>
+      <div class="stack" style="margin-top:16px;">
+        <div><label class="field-lbl">Nama Tag</label><input type="text" class="field" placeholder="cth. penting, rutin, travel"></div>
+        <div><label class="field-lbl">Warna (opsional)</label><input type="text" class="field" placeholder="cth. #EAB308" maxlength="20"></div>
+        <button class="neo-btn primary sm">Simpan Tag</button>
+      </div>
+    </div>
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Semua Tag (3)</h3></div>
+      <div class="list">
+        <div class="row"><span class="legend-dot" style="background:#EAB308"></span><b style="font-size:14px;">rutin</b><span class="t-muted" style="margin-left:auto;font-size:12px;">12 transaksi</span><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+        <div class="row"><span class="legend-dot" style="background:#D97706"></span><b style="font-size:14px;">penting</b><span class="t-muted" style="margin-left:auto;font-size:12px;">8 transaksi</span><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+        <div class="row"><span class="legend-dot" style="background:#64748B"></span><b style="font-size:14px;">travel</b><span class="t-muted" style="margin-left:auto;font-size:12px;">3 transaksi</span><button class="icon-btn sm" style="width:36px;height:36px;">🗑</button></div>
+      </div>
+    </div>
+  </div>
+`;
+
+/* ============ FINANCIAL HEALTH ============ */
+CONTENT.health = `
+  <div class="hdr">
+    <div>
+      <h1>Skor Kesehatan Keuangan</h1>
+      <p class="sub">Rasio tabungan, beban utang, dan kecukupan dana darurat bulan ini.</p>
+    </div>
+    <div class="hdr-actions"><button class="neo-btn sm" onclick="go('accounts')">Atur Akun Dana Darurat</button></div>
+  </div>
+  <div class="card neo-card">
+    <div class="grid-3 grid-mid" style="align-items:stretch;">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+        <div class="ring" style="--pct:78"><div class="ring-inner"><div style="font-size:36px;font-weight:700;">78</div><div style="font-size:12px;color:var(--text-muted);">dari 100</div></div></div>
+        <p style="margin:0;font-size:14px;font-weight:600;">Cukup Baik</p>
+      </div>
+      <div class="stack" style="grid-column:span 2;">
+        <div class="ratio-row neo-inset">
+          <div class="ic-box neo-inset-sm">🧮</div>
+          <div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">Rasio Tabungan</b><span class="badge badge-green">Sehat</span></div><div class="card-sub" style="margin-top:4px;">Persentase pemasukan yang berhasil ditabung/disisihkan bulan ini. Tabungan Anda 24.8% — di atas ideal 20%.</div></div>
+          <div style="text-align:right;"><div style="font-size:20px;font-weight:700;">24.8<span class="t-muted" style="font-size:14px;font-weight:500;">%</span></div><div style="font-size:11px;color:var(--text-muted);">Ideal ≥ 20%</div></div>
+        </div>
+        <div class="ratio-row neo-inset">
+          <div class="ic-box neo-inset-sm">💳</div>
+          <div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">Rasio Utang (DTI)</b><span class="badge badge-green">Sehat</span></div><div class="card-sub" style="margin-top:4px;">Total cicilan utang bulanan dibanding total pemasukan. Rasio Anda 20.1% — di bawah batas ideal 30%.</div></div>
+          <div style="text-align:right;"><div style="font-size:20px;font-weight:700;">20.1<span class="t-muted" style="font-size:14px;font-weight:500;">%</span></div><div style="font-size:11px;color:var(--text-muted);">Ideal ≤ 30%</div></div>
+        </div>
+        <div class="ratio-row neo-inset">
+          <div class="ic-box neo-inset-sm">🛡</div>
+          <div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><b style="font-size:14px;">Dana Darurat</b><span class="badge badge-yellow">Waspada</span></div><div class="card-sub" style="margin-top:4px;">Saldo akun bertanda Dana Darurat dibagi rata-rata pengeluaran bulanan. Hanya menutupi 2.8 bulan.</div></div>
+          <div style="text-align:right;"><div style="font-size:20px;font-weight:700;">2.8<span class="t-muted" style="font-size:14px;font-weight:500;"> bln</span></div><div style="font-size:11px;color:var(--text-muted);">Ideal 3–6 bulan</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card neo-card">
+    <div class="card-title">Rincian Perhitungan</div>
+    <div class="kpi-grid cols-5" style="margin-top:16px;">
+      ${kpi('Pemasukan Bulan Ini','Rp 20.320.000','Pemasukan','Tipe income bulan ini','t-positive')}
+      ${kpi('Pengeluaran Bulan Ini','Rp 13.145.000','Pengeluaran','Tipe expense bulan ini','t-muted')}
+      ${kpi('Cicilan Utang/Bulan','Rp 3.400.000','Utang','Sum monthly_installment','t-neg')}
+      ${kpi('Saldo Dana Darurat','Rp 32.000.000','Akun bertanda','Manual flag','t-info')}
+      ${kpi('Rata-rata Pengeluaran','Rp 11.400.000','3 bln terakhir','Avg pengeluaran','t-muted')}
+    </div>
+  </div>
+`;
+
+/* ============ EXPORTS ============ */
+CONTENT.exports = `
+  <div class="hdr">
+    <div>
+      <h1>Export &amp; Riwayat</h1>
+      <p class="sub">Buat file PDF, Excel, atau CSV dari laporan keuangan Anda.</p>
+    </div>
+  </div>
+  <div class="grid-23">
+    <div class="card neo-card">
+      <div class="card-title">Buat Export Baru</div>
+      <div class="grid-2" style="margin-top:16px;row-gap:16px;">
+        <div><label class="field-lbl">Jenis Laporan</label><select class="field"><option>Cash Flow</option><option>Net Worth</option><option>Budget vs Actual</option><option>Expense Breakdown</option><option>Transactions</option></select></div>
+        <div><label class="field-lbl">Format</label><select class="field"><option>PDF (siap cetak)</option><option>Excel</option><option>CSV</option></select></div>
+        <div><label class="field-lbl">Dari Tanggal</label><input type="date" class="field" value="2026-09-01"></div>
+        <div><label class="field-lbl">Sampai Tanggal</label><input type="date" class="field" value="2026-09-30"></div>
+      </div>
+      <div style="margin-top:20px;"><button class="neo-btn primary" style="width:100%;">Export</button></div>
+    </div>
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Riwayat Export</h3></div>
+      <div class="list">
+        <div class="row"><div class="ic-box neo-inset-sm">⇩</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Cash Flow · PDF</div><div style="font-size:12px;color:var(--text-muted);">01 Sep 2026 – 30 Sep 2026 · 3 menit lalu · Gia Pasaribu</div></div><span class="badge badge-green">Done</span><button class="neo-btn sm">Unduh</button></div>
+        <div class="row"><div class="ic-box neo-inset-sm">⇩</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Transactions · CSV</div><div style="font-size:12px;color:var(--text-muted);">01 Agu 2026 – 31 Agu 2026 · 2 jam lalu · Gia Pasaribu</div></div><span class="badge badge-green">Done</span><button class="neo-btn sm">Unduh</button></div>
+        <div class="row"><div class="ic-box neo-inset-sm">⇩</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Net Worth · Excel</div><div style="font-size:12px;color:var(--text-muted);">01 Agu 2026 – 31 Agu 2026 · kemarin · Gia Pasaribu</div></div><span class="badge badge-yellow">Pending</span></div>
+        <div class="row"><div class="ic-box neo-inset-sm">⇩</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Expense Breakdown · PDF</div><div style="font-size:12px;color:var(--text-muted);">01 Jul 2026 – 31 Jul 2026 · 5 hari lalu · Gia Pasaribu</div></div><span class="badge badge-red">Failed</span></div>
+      </div>
+    </div>
+  </div>
+`;
+
+/* ============ SETTINGS ============ */
+CONTENT.settings = `
+  <div class="hdr">
+    <div>
+      <h1>Workspace Settings</h1>
+      <p class="sub">Kelola nama, mata uang, dan anggota workspace Anda.</p>
+    </div>
+  </div>
+  <div class="grid-23">
+    <div class="card neo-card">
+      <div class="card-title">Informasi Workspace</div>
+      <div class="stack" style="margin-top:16px;">
+        <div><label class="field-lbl">Nama Workspace</label><input type="text" class="field" value="Personal Workspace" placeholder="cth. Keuangan Pribadi"></div>
+        <div><label class="field-lbl">Mata Uang</label><select class="field"><option>IDR — Rupiah</option><option>USD — Dolar AS</option><option>SGD — Dolar Singapura</option><option>MYR — Ringgit</option><option>EUR — Euro</option></select></div>
+        <div><button class="neo-btn primary sm">Simpan Perubahan</button></div>
+      </div>
+    </div>
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Anggota Workspace</h3></div>
+      <div class="list">
+        <div class="row"><div class="avatar" style="width:32px;height:32px;font-size:12px;">GP</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Gia Pasaribu</div><div style="font-size:12px;color:var(--text-muted);">gia@aturaja.com</div></div><span class="badge badge-green">owner</span></div>
+        <div class="row"><div class="avatar" style="width:32px;height:32px;font-size:12px;">RD</div><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Rina Dewi</div><div style="font-size:12px;color:var(--text-muted);">rina@aturaja.com</div></div><span class="badge badge-muted">member</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card neo-card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Backup &amp; Recovery</div>
+        <div class="card-sub">Buat salinan data workspace atau pulihkan dari backup dalam format JSON.</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="neo-inset" style="padding:20px;">
+        <div class="card-title" style="font-size:15px;">Buat Backup</div>
+        <div class="card-sub" style="margin-top:4px;">Pilih cakupan data yang ingin disalin, lalu unduh sebagai file JSON.</div>
+        <div style="margin-top:14px;"><label class="field-lbl">Cakupan Backup</label><select class="field"><option>Full data (seluruh catatan transaksi &amp; keuangan)</option><option>Settings saja (akun, kategori, tag, aturan berulang, budget)</option></select></div>
+        <button class="neo-btn sm" style="margin-top:14px;">⇩ Unduh Backup</button>
+      </div>
+      <div class="neo-inset" style="padding:20px;">
+        <div class="card-title" style="font-size:15px;">Restore / Recovery</div>
+        <div class="card-sub" style="margin-top:4px;">Unggah file backup JSON untuk mengganti data workspace yang ada. Operasi ini <b>menimpa seluruh data</b> sesuai cakupan backup.</div>
+        <div style="margin-top:14px;"><label class="field-lbl">File Backup (JSON)</label><input type="file" class="field" accept=".json,.txt,application/json"></div>
+        <button class="neo-btn danger sm" style="margin-top:14px;">↻ Restore Data</button>
+      </div>
+    </div>
+  </div>
+`;
+
+/* ============ BILLING & SUBSCRIPTION ============ */
+CONTENT.billing = `
+  <div class="hdr">
+    <div>
+      <h1>Billing &amp; Subscription</h1>
+      <p class="sub">Kelola paket langganan, metode pembayaran, dan riwayat tagihan Anda.</p>
+    </div>
+  </div>
+  <div class="kpi-grid cols-3">
+    ${kpi('Paket Aktif','Pro','','Renewal 15 Okt 2026 · Rp 49.000/bln','t-positive')}
+    ${kpi('Batas Workspace','3 dari 3','','Maksimal 3 workspace aktif','t-info')}
+    ${kpi('Tagihan Bulan Ini','Rp 49.000','Terbayar','Metode: BCA Virtual Account','t-positive')}
+  </div>
+  <div class="grid-2">
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Pilih Paket</h3></div>
+      <div class="list">
+        <div class="row">
+          <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:700;">Gratis</div><div class="card-sub" style="margin:0;">Rp 0 · 1 workspace · Akses fitur dasar</div></div>
+          <button class="neo-btn sm">Pilih</button>
+        </div>
+        <div class="row" style="background:var(--primary-soft);">
+          <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:700;">Pro <span class="badge badge-green" style="margin-left:4px;">Aktif</span></div><div class="card-sub" style="margin:0;">Rp 49.000/bln · 3 workspace · Semua fitur &amp; export</div></div>
+          <button class="neo-btn primary sm">Paket saat ini</button>
+        </div>
+        <div class="row">
+          <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:700;">Tim</div><div class="card-sub" style="margin:0;">Rp 99.000/bln · Workspace tanpa batas · Prioritas dukungan</div></div>
+          <button class="neo-btn sm">Upgrade</button>
+        </div>
+      </div>
+    </div>
+    <div class="card neo-card" style="padding:0;">
+      <div class="row-head"><h3 class="card-title">Riwayat Tagihan</h3></div>
+      <div class="list">
+        <div class="row"><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Langganan Pro — September</div><div style="font-size:12px;color:var(--text-muted);">15 Agu 2026 · BCA Virtual Account</div></div><b>Rp 49.000</b><span class="badge badge-green">Lunas</span></div>
+        <div class="row"><div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:600;">Langganan Pro — Agustus</div><div style="font-size:12px;color:var(--text-muted);">15 Jul 2026 · BCA Virtual Account</div></div><b>Rp 49.000</b><span class="badge badge-green">Lunas</span></div>
+      </div>
+    </div>
+  </div>
+`;
+
+/* =====================================================================
+   Router & lifecycle
+   ===================================================================== */
+const PAGES = {
+  dashboard:'Dashboard', transactions:'Transaksi', accounts:'Akun & Dompet',
+  recurring:'Transaksi Berulang', budgets:'Anggaran', networth:'Net Worth',
+  reports:'Reports', debts:'Utang & Piutang', categories:'Kategori & Tag',
+  health:'Financial Health', settings:'Workspace Settings', exports:'Export & Riwayat',
+  billing:'Billing & Subscription'
+};
+let charts = [];
+let currentPage = 'dashboard';
+
+function renderBreadcrumb(id){
+  const el = document.getElementById('breadcrumb');
+  el.innerHTML = `<a href="#" onclick="go('dashboard');return false;">Dashboard</a><span class="sep">›</span><span class="cur">${PAGES[id]||'Dashboard'}</span>`;
+}
+function destroyCharts(){ charts.forEach(c=>{ try{ c.destroy(); }catch(e){} }); charts=[]; }
+function go(id){
+  currentPage = id;
+  document.getElementById('main').innerHTML = CONTENT[id];
+  document.querySelectorAll('.nav-item[data-page]').forEach(n=>{
+    n.classList.toggle('active', n.dataset.page===id);
   });
+  renderBreadcrumb(id);
+  destroyCharts();
+  initPageCharts(id);
+  document.getElementById('main').scrollTop = 0;
+  window.scrollTo(0,0);
+  closeMobile();
+}
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('app').classList.toggle('sidebar-collapsed');
+}
+function toggleMobile(){
+  const sb = document.getElementById('sidebar');
+  const open = sb.classList.toggle('mobile-open');
+  document.body.classList.toggle('mobile-nav-open', open);
+  if(!open) closeWsDropdown();
+}
+function closeMobile(){
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.body.classList.remove('mobile-nav-open');
+}
+function toggleWorkspace(btn){
+  const open = document.getElementById('wsDropdown');
+  const isOpen = open.style.display === 'block';
+  closeWsDropdown();
+  if(!isOpen) open.style.display='block';
+}
+function closeWsDropdown(){
+  const d = document.getElementById('wsDropdown');
+  if(d) d.style.display='none';
+}
+function switchWorkspace(name, el){
+  closeWsDropdown();
+  document.querySelectorAll('.ws-name').forEach(function(n){ n.textContent = name; });
+  document.querySelectorAll('.ws-sub').forEach(function(n){ n.textContent = el.dataset.sub; });
+}
+function changeGranularity(v){
+  const labels = v==='day'?['1','5','10','15','20','25','30']:(v==='year'?['2019','2020','2021','2022','2023','2024','2025','2026']:['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']);
+  const chart = charts[0];
+  if(chart){ chart.data.labels = labels; chart.update(); }
+}
 
-  // Tab pill toggle (visual only, demo)
-  document.querySelectorAll('.tab-pill-group').forEach(group=>{
-    group.querySelectorAll('.tab-pill').forEach(p=>{
-      p.addEventListener('click', ()=>{
-        group.querySelectorAll('.tab-pill').forEach(x=>x.classList.remove('active'));
-        p.classList.add('active');
-      });
-    });
-  });
-
-  // Nav active state (demo)
-  document.querySelectorAll('.nav-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-      document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
-      item.classList.add('active');
-    });
-  });
-
-  const green = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-
-  // Cash flow bar chart
-  const ctx1 = document.getElementById('cashflowChart');
-  new Chart(ctx1, {
-    type: 'bar',
-    data: {
-      labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
-      datasets: [
-        { label:'Pemasukan', data:[14,16,15,18,20,22,19,20,17,16,15,14], backgroundColor:'#16A34A', borderRadius:6, barPercentage:.55 },
-        { label:'Pengeluaran', data:[9,10,9,11,13,14,12,13,11,10,9,9], backgroundColor:'#D7E9DB', borderRadius:6, barPercentage:.55 }
-      ]
-    },
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      animation:{ duration:900, easing:'easeOutQuart' },
-      plugins:{ legend:{ display:false } },
-      scales:{
-        x:{ grid:{ display:false }, ticks:{ color:'#6B8074', font:{ size:11, family:'Manrope' } } },
-        y:{ grid:{ color:'#DCE8DF' }, ticks:{ color:'#6B8074', font:{ size:11 }, callback:v=>v+'jt' } }
+const PAL = { green:'#16A34A', greenPale:'#D7E9DB', grid:'#DCE8DF', tick:'#6B8074' };
+function baseOpts(donut){ return {
+  responsive:true, maintainAspectRatio:false,
+  animation:{ duration:900, easing:'easeOutQuart' },
+  plugins:{ legend: donut ? { display:false } : { display:false } },
+  scales: donut ? undefined : {
+    x:{ grid:{ display:false }, ticks:{ color:PAL.tick, font:{ size:11, family:'Inter' } } },
+    y:{ grid:{ color:PAL.grid }, ticks:{ color:PAL.tick, font:{ size:11, family:'Inter' }, callback:v=>Math.round(v/1000)+'jt' } }
+  }
+};}
+const MONTH = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+function initPageCharts(id){
+  if(id==='dashboard'){
+    const t = document.getElementById('trendChart');
+    if(t) charts.push(new Chart(t,{ type:'bar',
+      data:{ labels:MONTH, datasets:[
+        { label:'Pemasukan', data:[14,16,15,18,20,22,19,20,17,16,15,14], backgroundColor:PAL.green, borderRadius:6, barPercentage:.55 },
+        { label:'Pengeluaran', data:[9,10,9,11,13,14,12,13,11,10,9,9], backgroundColor:PAL.greenPale, borderRadius:6, barPercentage:.55 },
+      ]},
+      options: baseOpts(false)
+    }));
+    const d = document.getElementById('doughnutChart');
+    if(d) charts.push(new Chart(d,{ type:'doughnut',
+      data:{ labels:['Makan & Harian','Cicilan','Transportasi','Hiburan','Lainnya'], datasets:[{ data:[32,24,18,14,12], backgroundColor:['#16A34A','#4ADE80','#A7F3D0','#D97706','#DC2626'], borderWidth:0, hoverOffset:6 }] },
+      options: baseOpts(true)
+    }));
+  }
+  if(id==='networth'){
+    const c = document.getElementById('networthChart');
+    if(c) charts.push(new Chart(c,{ type:'line',
+      data:{ labels:MONTH, datasets:[
+        { label:'Aset', data:[210,212,218,222,230,238,244,252,256,260,262,266], borderColor:PAL.green, backgroundColor:'rgba(22,163,74,0.08)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+        { label:'Kewajiban', data:[58,57,56,55,54,53,52,51,51,51,51,51], borderColor:'#D97706', backgroundColor:'rgba(217,119,6,0.06)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+        { label:'Net Worth', data:[152,155,162,167,176,185,192,201,205,209,211,215], borderColor:'#15803D', backgroundColor:'transparent', tension:.4, borderWidth:2.5, pointRadius:2 },
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+        animation:{ duration:900, easing:'easeOutQuart' },
+        plugins:{ legend:{ position:'bottom', labels:{ color:PAL.tick, usePointStyle:true, boxWidth:8, font:{ family:'Inter' } } } },
+        scales:{ x:{ grid:{ display:false }, ticks:{ color:PAL.tick, font:{ size:11, family:'Inter' } } },
+          y:{ grid:{ color:PAL.grid }, ticks:{ color:PAL.tick, font:{ size:11, family:'Inter' }, callback:v=>Math.round(v/1000)+'jt' } } }
       }
-    }
-  });
+    }));
+  }
+  if(id==='reports'){
+    const days = Array.from({length:30},(_,i)=>i+1);
+    const c = document.getElementById('reportsLineChart');
+    if(c) charts.push(new Chart(c,{ type:'line',
+      data:{ labels:days.map(String), datasets:[
+        { label:'Pemasukan', data:[0,0,0,0,0,0,0,0,0,16.8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3.5], borderColor:PAL.green, backgroundColor:'rgba(22,163,74,0.10)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+        { label:'Pengeluaran', data:[.3,.5,.15,.85,.4,.6,.2,1.2,.45,.3,.75,.5,.1,2.75,.3,.85,.4,.6,.15,1.0,.2,.45,.5,.3,.6,.15,.85,.4,.15,.15], borderColor:'#DC2626', backgroundColor:'rgba(220,38,38,0.08)', fill:true, tension:.4, borderWidth:2, pointRadius:2 },
+      ]},
+      options:{ responsive:true, maintainAspectRatio:false, interaction:{ mode:'index', intersect:false },
+        animation:{ duration:900, easing:'easeOutQuart' },
+        plugins:{ legend:{ display:false } },
+        scales:{ x:{ grid:{ display:false }, ticks:{ color:PAL.tick, font:{ size:11, family:'Inter' }, maxRotation:0, autoSkip:true } },
+          y:{ grid:{ color:PAL.grid }, ticks:{ color:PAL.tick, font:{ size:11, family:'Inter' }, callback:v=>Math.round(v)+'jt' } } }
+      }
+    }));
+  }
+}
 
-  // Expense breakdown doughnut
-  const ctx2 = document.getElementById('breakdownChart');
-  new Chart(ctx2, {
-    type: 'doughnut',
-    data: {
-      labels:['Makan & Harian','Cicilan','Transportasi','Hiburan','Lainnya'],
-      datasets:[{ data:[32,24,18,14,12], backgroundColor:['#16A34A','#4ADE80','#A7F3D0','#D97706','#DC2626'], borderWidth:0, hoverOffset:6 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false, cutout:'70%',
-      animation:{ duration:900, easing:'easeOutQuart' },
-      plugins:{ legend:{ display:false } }
-    }
-  });
+/* sidebar responsiveness show/hide toggle buttons */
+function setupResponsive(){
+  const w = () => window.innerWidth;
+  const apply = () => {
+    const sbBtn = document.getElementById('sbToggle');
+    const mBtn = document.getElementById('mobileBtn');
+    sbBtn.style.display = w() < 1024 ? 'none' : 'flex';
+    mBtn.style.display = w() < 760 ? 'flex' : 'none';
+    const sb = document.getElementById('sidebar');
+    if(w() < 1024 && !sb.classList.contains('mobile-open')) sb.classList.add('collapsed'), document.getElementById('app').classList.add('sidebar-collapsed');
+  };
+  apply();
+  window.addEventListener('resize', apply);
+}
+
+/* init */
+setupResponsive();
+
+/* wire semua item navigasi ke halaman statis masing-masing */
+document.querySelector('nav').addEventListener('click', function(e){
+  const item = e.target.closest('.nav-item[data-page]');
+  if(item){ go(item.dataset.page); closeWsDropdown(); }
+});
+
+/* tutup dropdown workspace saat klik di luar */
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#wsBox') && !e.target.closest('#wsDropdown')) closeWsDropdown();
+});
+
+go('dashboard');
 </script>
 </body>
 </html>
